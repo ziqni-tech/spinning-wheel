@@ -1,5 +1,4 @@
-// import './styles.css';
-// import * as d3 from 'd3';
+import './styles.css'; // import for build
 import { startConfetti } from './confetti.js';
 import { tilesData } from './helpers/tilesData.js';
 import { wheelSettings } from './helpers/wheelSettings.js';
