@@ -20,7 +20,7 @@ export function addTextElements(
     .attr('class', 'section-number')
     .attr('id', (d, i) => `section-${ i + 1 }`)
     .attr('width', (d, i) => {
-      const isVerticallyText = tilesData[i].constraints.includes('isVerticallyText');
+      const isVerticallyText = tilesData[i].contraints && tilesData[i].contraints.includes('isVerticallyText');
       if (tilesData[i] && tilesData[i].text && isVerticallyText) {
         return circleRadius;
       } else {
@@ -36,7 +36,7 @@ export function addTextElements(
     .style('white-space', 'nowrap')
     .style('overflow', 'visible')
     .attr('transform', (d, i) => {
-      const isVerticallyText = tilesData[i].constraints.includes('isVerticallyText');
+      const isVerticallyText = tilesData[i].contraints && tilesData[i].contraints.includes('isVerticallyText');
 
       if (tilesData[i].text && isVerticallyText) {
         d.innerRadius = 0;
@@ -60,7 +60,7 @@ export function addTextElements(
     .style('width', circleRadius)
     .style('height', '100%')
     .style('padding-left', (d, i) => {
-      const isVerticallyText = tilesData[i].constraints.includes('isVerticallyText');
+      const isVerticallyText = tilesData[i].contraints && tilesData[i].contraints.includes('isVerticallyText');
 
       return tilesData[i].text && isVerticallyText ? '25px' : '15px';
     })

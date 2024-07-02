@@ -1,6 +1,6 @@
 
 
-export const tilesData = [
+export const tiles = [
   {
     text: '<p class=\\"ql-align-center\\">Free spins 1</p>',
     background: '#223241',

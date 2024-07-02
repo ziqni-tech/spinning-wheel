@@ -1,20 +1,15 @@
 import './styles.css'; // import for build
-import { startConfetti } from './confetti.js';
-import { tilesData } from './helpers/tilesData.js';
-import { wheelSettings } from './helpers/wheelSettings.js';
+import { tiles } from './helpers/tilesData.js';
+import { wheelSettingsData } from './helpers/wheelSettings.js';
 import { generatePieData } from './helpers/generatePieData.js';
 import { createBorderImage, createWheelBorder } from './helpers/wheelBorders.js';
-import { loadImage } from './helpers/loadImage.js';
 import { createSections, insertWheelImage } from './helpers/wheelMiddlePart.js';
 import { createWheelImageButton, wheelCenterButton } from './helpers/wheelButton.js';
 import { addTextElements } from './helpers/textElements.js';
 import { createArrowImage } from './helpers/arrow.js';
 import { getSectionFill } from './helpers/getSectionFill.js';
-import { displayCongratulationsModal } from './helpers/displayCongratulationsModal.js';
 
-export function createSpinnerWheel() {
-
-
+export async function createSpinnerWheel(tilesData = tiles, wheelSettings = wheelSettingsData) {
   const spinnerContainer = d3.select('#spinner-container');
 
   const circleRadius = 125;
@@ -29,7 +24,10 @@ export function createSpinnerWheel() {
   const viewBoxWidth = circleRadius * 2 + 100;
   const viewBoxHeight = circleRadius * 2 + 30;
 
-  const iconUris = [];
+  const iconUris = tilesData.map(tile => {
+    const hasId = /\/_id\/[a-zA-Z0-9_-]+/.test(tile.iconLink);
+    return hasId ? tile.iconLink : null;
+  });
 
   function handleWindowResize() {
     window.location.reload();
@@ -71,7 +69,8 @@ export function createSpinnerWheel() {
   const pieData = generatePieData(circleRadius, tilesData.length, getSectionFill, svg, iconUris, tilesData, sectionColors);
 
 // BORDER
-  const borderImageUrl = './images/frame_img.png';
+  const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
+
   if (borderImageUrl) {
     createBorderImage(svg, circleRadius, borderImageUrl);
   } else {
@@ -79,8 +78,8 @@ export function createSpinnerWheel() {
   }
 
 // WHEEL SECTIONS
-  const middlePartImageUri = './images/middle_part_img.png';
-// const middlePartImageUri = '';
+  const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
+
   if (middlePartImageUri) {
     createSections(wheel, pieData, false);
     insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
@@ -89,19 +88,20 @@ export function createSpinnerWheel() {
   }
 
 // TEXT ELEMENTS
-// addTextElements(
-//   wheel,
-//   pieData,
-//   tilesData,
-//   circleRadius,
-//   getHeightFromHeader,
-//   getFontFamilyFromClass,
-//   getSvgTextAnchor
-// );
+addTextElements(
+  wheel,
+  pieData,
+  tilesData,
+  circleRadius,
+  getHeightFromHeader,
+  getFontFamilyFromClass,
+  getSvgTextAnchor
+);
 
 
 // BUTTON
-  const buttonImageUri = './images/button_img.png';
+  const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
+
   if (buttonImageUri) {
     createWheelImageButton(svg, circleRadius, buttonImageUri, spinWheel);
   } else {
@@ -109,7 +109,11 @@ export function createSpinnerWheel() {
   }
 
 // ARROW
-  createArrowImage(svg, circleRadius, centerX, centerY, './images/arrow_img.png');
+  const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage
+      ? wheelSettings.wheelSettings.wheelArrowImage
+      : './images/arrow_img.png';
+
+  createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
 
 
   const wheelGroup = d3.select('.wheel-group');
@@ -118,7 +122,6 @@ export function createSpinnerWheel() {
   async function spinWheel() {
     const randomIndex = Math.floor(Math.random() * sectionsCount);
     const giftValue = randomIndex + 1;
-
     const sliceWidth = 360 / sectionsCount;
     const currentAngle = 360 - sliceWidth * (giftValue - 0.5);
     const numberOfRotation = 360 * 5;
@@ -152,40 +155,23 @@ export function createSpinnerWheel() {
       .attr('stroke-width', (d, i) => i + 1 === giftValue ? '5' : '0')
       .attr('stroke', (d, i) => i + 1 === giftValue ? '#EE3EC8' : '#8D0C71');
 
+    const texts = wheelGroup.selectAll('.section-text');
+
+    texts
+        .attr('filter', (d, i) => i + 1 !== giftValue ? 'blur(3px)' : 'none');
+
     // Bring the winning section to the front
     sections
       .filter((d, i) => i + 1 === giftValue)
       .raise();
 
-    const texts = wheelGroup.selectAll('.section-text');
-    texts
-      .attr('filter', (d, i) => i + 1 !== giftValue ? 'blur(3px)' : 'none');
-
-    // Display congratulations modal and handle reward
-    displayCongratulationsModal(giftValue, tilesData, clearSVG, startConfetti, resetWheel, 2000);
-
+    window.parent.postMessage({ message: 'spinWheelCompleted', giftValue }, '*');
   }
 
 
   const resetWheel = () => {
     window.location.reload();
   };
-
-  async function getIconUri(id) {
-    const fileApiWsClient = new FilesApiWs(ApiClientStomp.instance);
-
-    const fileRequest = {
-      ids: [id],
-      limit: 1,
-      skip: 0
-    };
-
-    return new Promise((resolve) => {
-      fileApiWsClient.getFiles(fileRequest, (res) => {
-        resolve(res.data[0].uri);
-      });
-    });
-  }
 
   function getFontFamilyFromClass(fontMatch) {
     const fontName = fontMatch[1];

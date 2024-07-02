@@ -1,4 +1,4 @@
-export const wheelSettings = {
+export const wheelSettingsData = {
   wheelSettings: { buttonText: '<p><strong class="ql-font-arial" style="color: #F4B41C;">SPIN</strong></p>',
     wheelBackground: '#5E084B',
     spinButtonBackground: '#5E084B',

@@ -107,7 +107,7 @@ const wheelCenterButton = (svg, wheelSettings, centerX, centerY, spinWheel) => {
     .attr('x', centerX - buttonRadius)
     .attr('y', centerY - buttonRadius)
     .attr('width', buttonRadius * 2)
-    .attr('height', buttonRadius * 2)
+    .attr('height', buttonRadius * 2 + 3)
     .html((d, i) => {
       let content;
       let iconHTML = '';
@@ -140,7 +140,7 @@ const wheelCenterButton = (svg, wheelSettings, centerX, centerY, spinWheel) => {
         content = content.replace(/<h6/g, '<h6 style="margin: 0;"');
       }
 
-      return `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: ${ buttonRadius * 2 }px; height: ${ buttonRadius * 2 }px;">${ content }</div>`;
+      return `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: ${ buttonRadius * 2 }px; height: ${ buttonRadius * 2 }px; font-size: 10px; line-height: 12px;">${ content }</div>`;
     })
     .style('cursor', 'default')
     .on('click', spinWheel);
