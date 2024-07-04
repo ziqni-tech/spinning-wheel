@@ -84,6 +84,30 @@ function animateSpinButton(spinButton, centerX, centerY, screenHeight, circleRad
     });
 }
 
+function animateSpinButtonText(spinButtonText, centerX, centerY, screenHeight, circleRadius) {
+    spinButtonText
+        .transition()
+        .duration(1000)
+        .ease(d3.easeBackOut.overshoot(0.3))
+        .delay(4000)
+        .attr('transform', () => {
+            const newOffsetY = centerY + (screenHeight / 6) - circleRadius * 1.8 - 10;
+            return `translate(${ -centerX + 25 }, ${ newOffsetY }) scale(1.8)`;
+        });
+}
+
+function animateSpinButtonImage(spinButtonImage, centerX, centerY, screenHeight, circleRadius) {
+    spinButtonImage
+        .transition()
+        .duration(1000)
+        .ease(d3.easeBackOut.overshoot(0.3))
+        .delay(4000)
+        .attr('transform', () => {
+            const newOffsetY = centerY + (screenHeight / 6) - circleRadius * 1.8 - 10;
+            return `translate(${ -centerX + 25 }, ${ newOffsetY }) scale(1.8)`;
+        });
+}
+
 // Animation for wheel sections
 function animateWheelSections(wheelGroup, giftValue, middlePartImageUri) {
   const sections = wheelGroup.selectAll('.path-section');
@@ -113,7 +137,22 @@ function animateWheelSections(wheelGroup, giftValue, middlePartImageUri) {
 }
 
 // Function for animation that starts when rotation starts
-export function startSpinAnimations(wheelGroup, pointerArrowGroup, borderContainer, spinButton, targetRotation, circleRadius, centerX, centerY, screenHeight, screenWidth, middlePartImageUri, giftValue) {
+export function startSpinAnimations(
+    wheelGroup,
+    pointerArrowGroup,
+    borderContainer,
+    spinButton,
+    spinButtonText,
+    spinButtonImage,
+    targetRotation,
+    circleRadius,
+    centerX,
+    centerY,
+    screenHeight,
+    screenWidth,
+    middlePartImageUri,
+    giftValue
+) {
   animateWheelGroup(wheelGroup, targetRotation, circleRadius, screenHeight);
   animatePointerArrowGroup(pointerArrowGroup, circleRadius, centerX, centerY);
   animateSVGContainer(screenWidth);
@@ -121,5 +160,7 @@ export function startSpinAnimations(wheelGroup, pointerArrowGroup, borderContain
   animateBorderImageContainer(circleRadius, screenHeight);
   animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight);
   animateSpinButton(spinButton, centerX, centerY, screenHeight, circleRadius);
+  animateSpinButtonText(spinButtonText, centerX, centerY, screenHeight, circleRadius);
+  animateSpinButtonImage(spinButtonImage, centerX, centerY, screenHeight, circleRadius);
   animateWheelSections(wheelGroup, giftValue, middlePartImageUri);
 }

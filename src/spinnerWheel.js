@@ -35,16 +35,15 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
 
   window.addEventListener('resize', handleWindowResize);
 
-// Cleaning up SVG before adding new elements
+  // Cleaning up SVG before adding new elements
   function clearSVG() {
     d3.select('#spinner-container').select('svg').remove();
   }
 
-// Calling the SVG cleanup function before adding new elements
+  // Calling the SVG cleanup function before adding new elements
   clearSVG();
-// -45 -15 350 280
 
-// Create an SVG element to render the spinner
+  // Create an SVG element to render the spinner
   const svg = spinnerContainer
     .append('svg')
     .attr('viewBox', `${minX} ${minY} ${viewBoxWidth} ${viewBoxHeight}`)
@@ -52,7 +51,7 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
     .attr('width', minDimension)
     .attr('height', minDimension);
 
-// Calculate the coordinates of the SVG center
+  // Calculate the coordinates of the SVG center
   const centerX = minX + (viewBoxWidth / 2);
   const centerY = minY + (viewBoxHeight / 2);
 
@@ -68,7 +67,7 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
 
   const pieData = generatePieData(circleRadius, tilesData.length, getSectionFill, svg, iconUris, tilesData, sectionColors);
 
-// BORDER
+  // BORDER
   const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
 
   if (borderImageUrl) {
@@ -77,7 +76,7 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
     createWheelBorder(svg, circleRadius, wheelSettings.wheelSettings);
   }
 
-// WHEEL SECTIONS
+  // WHEEL SECTIONS
   const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
 
   if (middlePartImageUri) {
@@ -87,19 +86,19 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
     createSections(wheel, pieData);
   }
 
-// TEXT ELEMENTS
-addTextElements(
-  wheel,
-  pieData,
-  tilesData,
-  circleRadius,
-  getHeightFromHeader,
-  getFontFamilyFromClass,
-  getSvgTextAnchor
-);
+  // TEXT ELEMENTS
+  addTextElements(
+    wheel,
+    pieData,
+    tilesData,
+    circleRadius,
+    getHeightFromHeader,
+    getFontFamilyFromClass,
+    getSvgTextAnchor
+  );
 
 
-// BUTTON
+  // BUTTON
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
   if (buttonImageUri) {
@@ -108,7 +107,7 @@ addTextElements(
     wheelCenterButton(svg, wheelSettings.wheelSettings, centerX, centerY, spinWheel);
   }
 
-// ARROW
+  // ARROW
   const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage
       ? wheelSettings.wheelSettings.wheelArrowImage
       : './images/arrow_img.png';
@@ -121,7 +120,7 @@ addTextElements(
 
   async function spinWheel() {
     const randomIndex = Math.floor(Math.random() * sectionsCount);
-    const giftValue = randomIndex + 1;
+    const giftValue = prizeSection ? prizeSection : randomIndex + 1;
     const sliceWidth = 360 / sectionsCount;
     const currentAngle = 360 - sliceWidth * (giftValue - 0.5);
     const numberOfRotation = 360 * 5;
@@ -166,6 +165,9 @@ addTextElements(
       .raise();
 
     window.parent.postMessage({ message: 'spinWheelCompleted', giftValue }, '*');
+    if (typeof onSpinComplete === 'function') {
+      onSpinComplete({ isCompleted: true });
+    }
   }
 
 
