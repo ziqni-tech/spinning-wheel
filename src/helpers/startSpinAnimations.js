@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 // Animation for wheelGroup
 function animateWheelGroup(wheelGroup, targetRotation, circleRadius, screenHeight) {
   wheelGroup
@@ -55,8 +56,9 @@ function animateBorderImageContainer(circleRadius, screenHeight) {
 }
 
 // Animation for pointerArrowGroup at the end
-function animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight) {
-  const arrowImageSize = circleRadius / 2.5;
+function animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight, isPointerArrowImage) {
+    console.warn('defaultArrow =>', isPointerArrowImage);
+  const arrowImageSize = isPointerArrowImage ? circleRadius / 2.5 : circleRadius / 1.8;
   pointerArrowGroup
     .transition()
     .duration(1000)
@@ -64,8 +66,12 @@ function animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, c
     .delay(4000)
     .attr('transform', () => {
       const rotationAngle = 0;
-      const newOffsetX = centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize;
-      const newOffsetY = centerY + (screenHeight / 6) - circleRadius * 1.8 - arrowImageSize / 2 - 36;
+      const newOffsetX = isPointerArrowImage
+          ? centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize
+          : centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize + 20;
+      const newOffsetY = isPointerArrowImage
+          ? centerY + (screenHeight / 6) - circleRadius * 1.8 - arrowImageSize / 2 - 36
+          : centerY + (screenHeight / 6) - circleRadius * 1.8 - arrowImageSize / 2 - 46;
 
       return `translate(${ newOffsetX }, ${ newOffsetY }) rotate(${ rotationAngle }) scale(1.8)`;
     });
@@ -151,14 +157,15 @@ export function startSpinAnimations(
     screenHeight,
     screenWidth,
     middlePartImageUri,
-    giftValue
+    giftValue,
+    isPointerArrowImage
 ) {
   animateWheelGroup(wheelGroup, targetRotation, circleRadius, screenHeight);
   animatePointerArrowGroup(pointerArrowGroup, circleRadius, centerX, centerY);
   animateSVGContainer(screenWidth);
   animateBorderContainer(borderContainer, circleRadius, screenHeight);
   animateBorderImageContainer(circleRadius, screenHeight);
-  animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight);
+  animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight, isPointerArrowImage);
   animateSpinButton(spinButton, centerX, centerY, screenHeight, circleRadius);
   animateSpinButtonText(spinButtonText, centerX, centerY, screenHeight, circleRadius);
   animateSpinButtonImage(spinButtonImage, centerX, centerY, screenHeight, circleRadius);

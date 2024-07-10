@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import { loadImage } from './loadImage.js';
 
 const defaultWheelBackground = '#5E084B';
@@ -18,7 +19,7 @@ const outerCircleBordersGradientData = [
   { offset: '87.83%', color: '#F9DF7B' }
 ];
 
-async function createBorderImage(svg, radius, imageUrl) {
+export async function createBorderImage(svg, radius, imageUrl) {
   const imageSize = radius * 2 + 50;
 
   const borderImageGroup = svg.append('g').attr('class', 'border-image-container');
@@ -39,7 +40,7 @@ async function createBorderImage(svg, radius, imageUrl) {
   svg.node().insertBefore(borderImageGroup.node(), svg.node().firstChild);
 }
 
-const createWheelBorder = (svg, radius, wheelSettings) => {
+export const createWheelBorder = (svg, radius, wheelSettings) => {
 
   const borderContainer = svg.append('g')
     .attr('class', 'border-container')
@@ -92,4 +93,3 @@ const createWheelBorder = (svg, radius, wheelSettings) => {
   svg.node().insertBefore(borderContainer.node(), svg.node().firstChild);
 };
 
-export { createBorderImage, createWheelBorder };

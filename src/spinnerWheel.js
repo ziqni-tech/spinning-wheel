@@ -1,4 +1,5 @@
-import './styles.css'; // import for build
+import * as d3 from 'd3';
+// import './styles.css'; // import for build
 import { tiles } from './helpers/tilesData.js';
 import { wheelSettingsData } from './helpers/wheelSettings.js';
 import { generatePieData } from './helpers/generatePieData.js';
@@ -6,16 +7,23 @@ import { createBorderImage, createWheelBorder } from './helpers/wheelBorders.js'
 import { createSections, insertWheelImage } from './helpers/wheelMiddlePart.js';
 import { createWheelImageButton, wheelCenterButton } from './helpers/wheelButton.js';
 import { addTextElements } from './helpers/textElements.js';
-import { createArrowImage } from './helpers/arrow.js';
+import { createArrowImage, createArrowPointer } from './helpers/arrow.js';
 import { getSectionFill } from './helpers/getSectionFill.js';
 
-export async function createSpinnerWheel(tilesData = tiles, wheelSettings = wheelSettingsData) {
-  const spinnerContainer = d3.select('#spinner-container');
+export async function createSpinnerWheel(
+  containerId,
+  tilesData = tiles,
+  wheelSettings = wheelSettingsData,
+  prizeSection,
+  onSpinComplete
+) {
+  const spinnerContainer = d3.select(containerId);
 
   const circleRadius = 125;
+  const boundingRect = spinnerContainer.node().getBoundingClientRect();
 
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
+  const screenWidth = boundingRect.width;
+  const screenHeight = boundingRect.height;
 
   const minDimension = Math.min(screenWidth, screenHeight);
 
@@ -46,7 +54,7 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
   // Create an SVG element to render the spinner
   const svg = spinnerContainer
     .append('svg')
-    .attr('viewBox', `${minX} ${minY} ${viewBoxWidth} ${viewBoxHeight}`)
+    .attr('viewBox', `${ minX } ${ minY } ${ viewBoxWidth } ${ viewBoxHeight }`)
     .attr('preserveAspectRatio', 'xMidYMid meet')
     .attr('width', minDimension)
     .attr('height', minDimension);
@@ -63,7 +71,7 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
 
   const wheel = svg.append('g')
     .attr('class', 'wheel-group') // Assign a class to the wheel group
-    .attr('transform', `translate(${circleRadius + 4},${circleRadius + 4}) rotate(${startAngleFirstSection})`);
+    .attr('transform', `translate(${ circleRadius + 4 },${ circleRadius + 4 }) rotate(${ startAngleFirstSection })`);
 
   const pieData = generatePieData(circleRadius, tilesData.length, getSectionFill, svg, iconUris, tilesData, sectionColors);
 
@@ -97,7 +105,6 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
     getSvgTextAnchor
   );
 
-
   // BUTTON
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
@@ -108,12 +115,13 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
   }
 
   // ARROW
-  const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage
-      ? wheelSettings.wheelSettings.wheelArrowImage
-      : './images/arrow_img.png';
+  const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage;
 
-  createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
-
+  if (arrowImageUri) {
+    createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
+  } else {
+    createArrowPointer(svg, circleRadius, centerX, centerY);
+  }
 
   const wheelGroup = d3.select('.wheel-group');
   const spinButton = d3.select('.spin-button');
@@ -140,7 +148,7 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
         const rotationAngle = interpolate(t);
 
         // Apply rotation only to the wheel group
-        wheelGroup.attr('transform', `translate(${circleRadius + 4},${circleRadius + 4}) rotate(${rotationAngle})`);
+        wheelGroup.attr('transform', `translate(${ circleRadius + 4 },${ circleRadius + 4 }) rotate(${ rotationAngle })`);
       })
       .end();
 
@@ -157,14 +165,13 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
     const texts = wheelGroup.selectAll('.section-text');
 
     texts
-        .attr('filter', (d, i) => i + 1 !== giftValue ? 'blur(3px)' : 'none');
+      .attr('filter', (d, i) => i + 1 !== giftValue ? 'blur(3px)' : 'none');
 
     // Bring the winning section to the front
     sections
       .filter((d, i) => i + 1 === giftValue)
       .raise();
 
-    window.parent.postMessage({ message: 'spinWheelCompleted', giftValue }, '*');
     if (typeof onSpinComplete === 'function') {
       onSpinComplete({ isCompleted: true });
     }
@@ -241,4 +248,6 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
       return '22px';
     }
   }
+
+  return { isCreated: true };
 }

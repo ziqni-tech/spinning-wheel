@@ -1,7 +1,6 @@
 import { loadImage } from './loadImage.js';
 
-
-async function createWheelImageButton(svg, circleRadius, imageUrl, spinWheel) {
+export async function createWheelImageButton(svg, circleRadius, imageUrl, spinWheel) {
   const buttonImageGroup = svg
     .append('g')
     .attr('class', 'spin-button');
@@ -22,7 +21,7 @@ async function createWheelImageButton(svg, circleRadius, imageUrl, spinWheel) {
     });
 }
 
-const wheelCenterButton = (svg, wheelSettings, centerX, centerY, spinWheel) => {
+export const wheelCenterButton = (svg, wheelSettings, centerX, centerY, spinWheel) => {
   const stopsData = [
     { offset: '3.08%', color: '#F9DF7B' },
     { offset: '21.59%', color: '#B57E10' },
@@ -146,4 +145,3 @@ const wheelCenterButton = (svg, wheelSettings, centerX, centerY, spinWheel) => {
     .on('click', spinWheel);
 };
 
-export { createWheelImageButton, wheelCenterButton };

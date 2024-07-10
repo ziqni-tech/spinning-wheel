@@ -1,6 +1,6 @@
 import { loadImage } from './loadImage.js';
 
-function createSections(wheel, pieData, useFill = true) {
+export function createSections(wheel, pieData, useFill = true) {
   wheel
     .append('g')
     .selectAll('.path-section')
@@ -15,7 +15,7 @@ function createSections(wheel, pieData, useFill = true) {
     .attr('stroke-width', (d) => d.strokeWidth);
 }
 
-const insertWheelImage = async (wheel, imageUrl, circleRadius, sectionsCount) => {
+export const insertWheelImage = async (wheel, imageUrl, circleRadius, sectionsCount) => {
   const angleOffset = 360 / (2 * sectionsCount);
   const imageSize = circleRadius * 2;
   const image = await loadImage(imageUrl);
@@ -30,5 +30,3 @@ const insertWheelImage = async (wheel, imageUrl, circleRadius, sectionsCount) =>
     .attr('width', imageSize)
     .attr('height', imageSize);
 };
-
-export { createSections, insertWheelImage }

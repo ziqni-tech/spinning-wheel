@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import './styles.css'; // import for build
 import { tiles } from './helpers/tilesData.js';
 import { wheelSettingsData } from './helpers/wheelSettings.js';
@@ -6,17 +7,25 @@ import { createBorderImage, createWheelBorder } from './helpers/wheelBorders.js'
 import { createSections, insertWheelImage } from './helpers/wheelMiddlePart.js';
 import { createWheelImageButton, wheelCenterButton } from './helpers/wheelButton.js';
 import { addTextElements } from './helpers/textElements.js';
-import { createArrowImage } from './helpers/arrow.js';
+import { createArrowImage, createArrowPointer } from './helpers/arrow.js';
 import { getSectionFill } from './helpers/getSectionFill.js';
 import { startSpinAnimations } from './helpers/startSpinAnimations.js';
 
-export async function createSpinnerWheel(tilesData = tiles, wheelSettings = wheelSettingsData, prizeSection) {
-  const spinnerContainer = d3.select('#spinner-container');
+export async function createSpinnerWheelWithAnimation(
+    containerId,
+    tilesData = tiles,
+    wheelSettings = wheelSettingsData,
+    prizeSection,
+    onSpinComplete
+) {
+
+  const spinnerContainer = d3.select(containerId);
 
   const circleRadius = 125;
+  const boundingRect = spinnerContainer.node().getBoundingClientRect();
 
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
+  const screenWidth = boundingRect.width;
+  const screenHeight = boundingRect.height;
 
   const minDimension = Math.min(screenWidth, screenHeight);
 
@@ -109,10 +118,14 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
 
   // ARROW
   const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage
-      ? wheelSettings.wheelSettings.wheelArrowImage
-      : './images/arrow_img.png';
+      // ? wheelSettings.wheelSettings.wheelArrowImage
+      // : './images/arrow_img.png';
 
-  createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
+  if (arrowImageUri) {
+    createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
+  } else {
+    createArrowPointer(svg, circleRadius, centerX, centerY);
+  }
 
 
   const wheelGroup = d3.select('.wheel-group');
@@ -165,12 +178,15 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
               screenHeight,
               screenWidth,
               middlePartImageUri,
-              giftValue
+              giftValue,
+              !!arrowImageUri
           );
         });
 
     setTimeout(() => {
-      window.parent.postMessage({ message: 'spinWheelCompleted', giftValue }, '*');
+      if (typeof onSpinComplete === 'function') {
+        onSpinComplete({ isCompleted: true });
+      }
     }, 5500)
 
   }
@@ -241,4 +257,6 @@ export async function createSpinnerWheel(tilesData = tiles, wheelSettings = whee
       return '22px';
     }
   }
+
+  return { isCreated: true };
 }
