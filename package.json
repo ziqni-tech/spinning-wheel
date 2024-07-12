@@ -2,12 +2,13 @@
   "name": "spinning-wheel",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "exports": "./dist/bundle.js",
+  "main": "dist/bundle.js",
+  "exports": {
+    ".": "./dist/bundle.es.js"
+  },
   "type": "module",
   "scripts": {
-    "build": "webpack --mode production --config webpack.config.js",
-    "babel-build": "babel src -d dist"
+    "build": "vite build"
   },
   "repository": {
     "type": "git",
@@ -16,24 +17,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/cli": "^7.24.7",
-    "@babel/preset-env": "^7.24.7",
     "autoprefixer": "^10.4.17",
-    "d3": "^7.9.0"
+    "d3": "^7.9.0",
+    "vite": "^5.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
     "@babel/preset-react": "^7.23.3",
-    "babel-loader": "^9.1.3",
-    "clean-webpack-plugin": "^4.0.0",
-    "copy-webpack-plugin": "^12.0.2",
-    "css-loader": "^6.10.0",
-    "html-loader": "^5.0.0",
-    "html-webpack-plugin": "^5.6.0",
-    "mini-css-extract-plugin": "^2.8.0",
-    "style-loader": "^3.3.4",
-    "webpack": "^5.90.1",
-    "webpack-cli": "^5.1.4"
+    "babel-loader": "^9.1.3"
   },
   "bugs": {
     "url": "https://github.com/ziqni-tech/spinning-wheel/issues"
