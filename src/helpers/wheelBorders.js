@@ -19,17 +19,20 @@ const outerCircleBordersGradientData = [
   { offset: '87.83%', color: '#F9DF7B' }
 ];
 
-export async function createBorderImage(svg, radius, imageUrl) {
-  const imageSize = radius * 2 + 50;
+export async function createBorderImage(svg, centerX, centerY, radius, imageUrl) {
+  const borderWidth = radius / 10 * 2;
+  // const imageSize = radius >= 280 ? radius * 2 + 80 : radius * 2 + 50;
+  const imageSize = radius * 2 + borderWidth;
 
-  const borderImageGroup = svg.append('g').attr('class', 'border-image-container');
+  const borderImageGroup = svg.append('g')
+    .attr('class', 'border-image-container')
+    .attr('transform', `translate(${ centerX },${ centerY })`);
 
   const image = await loadImage(imageUrl);
 
   borderImageGroup
     .append('image')
     .attr('class', 'border-image')
-    .attr('transform', `translate(${ radius + 4 },${ radius + 4 })`)
     .attr('xlink:href', image.src)
     .attr('x', -imageSize / 2)
     .attr('y', -imageSize / 2)
@@ -40,13 +43,9 @@ export async function createBorderImage(svg, radius, imageUrl) {
   svg.node().insertBefore(borderImageGroup.node(), svg.node().firstChild);
 }
 
-export const createWheelBorder = (svg, radius, wheelSettings) => {
+export const createWheelBorder = (svg, borderContainer, radius, wheelSettings) => {
+  const strokeWidth = radius / 10 * 2;
 
-  const borderContainer = svg.append('g')
-    .attr('class', 'border-container')
-    .attr('transform', `translate(${ radius + 4 },${ radius + 4 })`);
-
-  // const wheelSettings = props.wheelSettings;
   const wheelBackground = wheelSettings && wheelSettings.wheelBackground
     ? wheelSettings.wheelBackground
     : defaultWheelBackground;
@@ -70,24 +69,27 @@ export const createWheelBorder = (svg, radius, wheelSettings) => {
     ? wheelSettings.wheelBordersColor
     : 'url(#circle-borders-gradient)';
 
+  const outerCircleBorderRadius = radius + strokeWidth / 2;
   borderContainer
     .append('circle')
     .attr('class', 'outer-circle-border')
     .attr('cx', 0)
     .attr('cy', 0)
-    .attr('r', radius + 15)
+    .attr('r', outerCircleBorderRadius)
     .attr('fill', 'none')
-    .attr('stroke-width', 30)
+    .attr('stroke-width', strokeWidth)
     .attr('stroke', wheelBordersColor);
+
+  const outerCircleRadius = outerCircleBorderRadius + ((strokeWidth - (strokeWidth * 0.8)) / 10);
 
   borderContainer
     .append('circle')
     .attr('class', 'outer-circle')
     .attr('cx', 0)
     .attr('cy', 0)
-    .attr('r', radius + 15)
+    .attr('r', outerCircleRadius)
     .attr('fill', 'none')
-    .attr('stroke-width', 20)
+    .attr('stroke-width', strokeWidth * 0.8)
     .attr('stroke', wheelBackground);
 
   svg.node().insertBefore(borderContainer.node(), svg.node().firstChild);

@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-// import './styles.css'; // import for build
 import { tiles } from './helpers/tilesData.js';
 import { wheelSettingsData } from './helpers/wheelSettings.js';
 import { generatePieData } from './helpers/generatePieData.js';
@@ -15,22 +14,16 @@ export async function createSpinnerWheel(
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   prizeSection,
-  onSpinComplete
+  onSpinComplete,
+  externalSpinFlag = false
 ) {
+
   const spinnerContainer = d3.select(containerId);
-
-  const circleRadius = 125;
   const boundingRect = spinnerContainer.node().getBoundingClientRect();
-
   const screenWidth = boundingRect.width;
   const screenHeight = boundingRect.height;
-
   const minDimension = Math.min(screenWidth, screenHeight);
-
-  const minX = -45;
-  const minY = -15;
-  const viewBoxWidth = circleRadius * 2 + 100;
-  const viewBoxHeight = circleRadius * 2 + 30;
+  const circleRadius = minDimension / 3.5;
 
   const iconUris = tilesData.map(tile => {
     const hasId = /\/_id\/[a-zA-Z0-9_-]+/.test(tile.iconLink);
@@ -51,17 +44,19 @@ export async function createSpinnerWheel(
   // Calling the SVG cleanup function before adding new elements
   clearSVG();
 
-  // Create an SVG element to render the spinner
+  const containerWidth = boundingRect.width;
+  const containerHeight = boundingRect.height;
+
   const svg = spinnerContainer
     .append('svg')
-    .attr('viewBox', `${ minX } ${ minY } ${ viewBoxWidth } ${ viewBoxHeight }`)
+    .attr('viewBox', `0 0 ${ containerWidth } ${ containerHeight }`)
     .attr('preserveAspectRatio', 'xMidYMid meet')
-    .attr('width', minDimension)
-    .attr('height', minDimension);
+    .attr('width', containerWidth)
+    .attr('height', containerHeight);
 
   // Calculate the coordinates of the SVG center
-  const centerX = minX + (viewBoxWidth / 2);
-  const centerY = minY + (viewBoxHeight / 2);
+  const centerX = containerWidth / 2;
+  const centerY = containerHeight / 2;
 
   const sectionsCount = tilesData.length;
   const sectionColors = ['#9694f5', '#50f5ff'];
@@ -69,9 +64,16 @@ export async function createSpinnerWheel(
   const degreesPerSection = 360 / sectionsCount;
   const startAngleFirstSection = -0.5 * degreesPerSection;
 
+  const viewBoxCenterX = containerWidth / 2;
+  const viewBoxCenterY = containerHeight / 2;
+
   const wheel = svg.append('g')
     .attr('class', 'wheel-group') // Assign a class to the wheel group
-    .attr('transform', `translate(${ circleRadius + 4 },${ circleRadius + 4 }) rotate(${ startAngleFirstSection })`);
+    .attr('transform', `translate(${ viewBoxCenterX }, ${ viewBoxCenterY }) rotate(${ startAngleFirstSection })`);
+
+  const borderContainer = svg.append('g')
+    .attr('class', 'border-container')
+    .attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY })`);
 
   const pieData = generatePieData(circleRadius, tilesData.length, getSectionFill, svg, iconUris, tilesData, sectionColors);
 
@@ -79,9 +81,9 @@ export async function createSpinnerWheel(
   const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
 
   if (borderImageUrl) {
-    createBorderImage(svg, circleRadius, borderImageUrl);
+    createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
   } else {
-    createWheelBorder(svg, circleRadius, wheelSettings.wheelSettings);
+    createWheelBorder(svg, borderContainer, circleRadius, wheelSettings.wheelSettings);
   }
 
   // WHEEL SECTIONS
@@ -109,9 +111,9 @@ export async function createSpinnerWheel(
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
   if (buttonImageUri) {
-    createWheelImageButton(svg, circleRadius, buttonImageUri, spinWheel);
+    createWheelImageButton(svg, centerX, centerY, circleRadius, buttonImageUri, externalSpinFlag ? null : spinWheel);
   } else {
-    wheelCenterButton(svg, wheelSettings.wheelSettings, centerX, centerY, spinWheel);
+    wheelCenterButton(svg, wheelSettings.wheelSettings, circleRadius, centerX, centerY, externalSpinFlag ? null : spinWheel);
   }
 
   // ARROW
@@ -148,7 +150,7 @@ export async function createSpinnerWheel(
         const rotationAngle = interpolate(t);
 
         // Apply rotation only to the wheel group
-        wheelGroup.attr('transform', `translate(${ circleRadius + 4 },${ circleRadius + 4 }) rotate(${ rotationAngle })`);
+        wheelGroup.attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY }) rotate(${ rotationAngle })`);
       })
       .end();
 
@@ -249,5 +251,5 @@ export async function createSpinnerWheel(
     }
   }
 
-  return { isCreated: true };
+  return { isCreated: true, spinWheel };
 }

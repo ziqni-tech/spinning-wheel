@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-import './styles.css'; // import for build
 import { tiles } from './helpers/tilesData.js';
 import { wheelSettingsData } from './helpers/wheelSettings.js';
 import { generatePieData } from './helpers/generatePieData.js';
@@ -12,27 +11,20 @@ import { getSectionFill } from './helpers/getSectionFill.js';
 import { startSpinAnimations } from './helpers/startSpinAnimations.js';
 
 export async function createSpinnerWheelWithAnimation(
-    containerId,
-    tilesData = tiles,
-    wheelSettings = wheelSettingsData,
-    prizeSection,
-    onSpinComplete
+  containerId,
+  tilesData = tiles,
+  wheelSettings = wheelSettingsData,
+  prizeSection,
+  onSpinComplete,
+  externalSpinFlag = false
 ) {
 
   const spinnerContainer = d3.select(containerId);
-
-  const circleRadius = 125;
   const boundingRect = spinnerContainer.node().getBoundingClientRect();
-
   const screenWidth = boundingRect.width;
   const screenHeight = boundingRect.height;
-
   const minDimension = Math.min(screenWidth, screenHeight);
-
-  const minX = -45;
-  const minY = -15;
-  const viewBoxWidth = circleRadius * 2 + 100;
-  const viewBoxHeight = circleRadius * 2 + 30;
+  const circleRadius = minDimension / 3.5;
 
   const iconUris = tilesData.map(tile => {
     const hasId = /\/_id\/[a-zA-Z0-9_-]+/.test(tile.iconLink);
@@ -53,17 +45,19 @@ export async function createSpinnerWheelWithAnimation(
   // Calling the SVG cleanup function before adding new elements
   clearSVG();
 
-  // Create an SVG element to render the spinner
+  const containerWidth = boundingRect.width;
+  const containerHeight = boundingRect.height;
+
   const svg = spinnerContainer
-      .append('svg')
-      .attr('viewBox', `${minX} ${minY} ${viewBoxWidth} ${viewBoxHeight}`)
-      .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr('width', minDimension)
-      .attr('height', minDimension);
+    .append('svg')
+    .attr('viewBox', `0 0 ${ containerWidth } ${ containerHeight }`)
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .attr('width', containerWidth)
+    .attr('height', containerHeight);
 
   // Calculate the coordinates of the SVG center
-  const centerX = minX + (viewBoxWidth / 2);
-  const centerY = minY + (viewBoxHeight / 2);
+  const centerX = containerWidth / 2;
+  const centerY = containerHeight / 2;
 
   const sectionsCount = tilesData.length;
   const sectionColors = ['#9694f5', '#50f5ff'];
@@ -71,24 +65,40 @@ export async function createSpinnerWheelWithAnimation(
   const degreesPerSection = 360 / sectionsCount;
   const startAngleFirstSection = -0.5 * degreesPerSection;
 
+  const viewBoxCenterX = containerWidth / 2;
+  const viewBoxCenterY = containerHeight / 2;
+
   const wheel = svg.append('g')
-      .attr('class', 'wheel-group') // Assign a class to the wheel group
-      .attr('transform', `translate(${circleRadius + 4},${circleRadius + 4}) rotate(${startAngleFirstSection})`);
+    .attr('class', 'wheel-group') // Assign a class to the wheel group
+    .attr('transform', `translate(${ viewBoxCenterX }, ${ viewBoxCenterY }) rotate(${ startAngleFirstSection })`);
 
-  const pieData = generatePieData(circleRadius, tilesData.length, getSectionFill, svg, iconUris, tilesData, sectionColors);
 
-  // BORDER
+  const borderContainer = svg.append('g')
+    .attr('class', 'border-container')
+    .attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY })`);
+
+  const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
   const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
 
+  const pieData = generatePieData(
+    circleRadius,
+    tilesData.length,
+    getSectionFill,
+    svg,
+    iconUris,
+    tilesData,
+    sectionColors,
+    !!middlePartImageUri
+  );
+
+  // BORDER
   if (borderImageUrl) {
-    createBorderImage(svg, circleRadius, borderImageUrl);
+    createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
   } else {
-    createWheelBorder(svg, circleRadius, wheelSettings.wheelSettings);
+    createWheelBorder(svg, borderContainer, circleRadius, wheelSettings.wheelSettings);
   }
 
   // WHEEL SECTIONS
-  const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
-
   if (middlePartImageUri) {
     createSections(wheel, pieData, false);
     insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
@@ -98,28 +108,26 @@ export async function createSpinnerWheelWithAnimation(
 
   // TEXT ELEMENTS
   addTextElements(
-      wheel,
-      pieData,
-      tilesData,
-      circleRadius,
-      getHeightFromHeader,
-      getFontFamilyFromClass,
-      getSvgTextAnchor
+    wheel,
+    pieData,
+    tilesData,
+    circleRadius,
+    getHeightFromHeader,
+    getFontFamilyFromClass,
+    getSvgTextAnchor
   );
 
   // BUTTON
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
   if (buttonImageUri) {
-    createWheelImageButton(svg, circleRadius, buttonImageUri, spinWheel);
+    createWheelImageButton(svg, centerX, centerY, circleRadius, buttonImageUri, externalSpinFlag ? null : spinWheel);
   } else {
-    wheelCenterButton(svg, wheelSettings.wheelSettings, centerX, centerY, spinWheel);
+    wheelCenterButton(svg, wheelSettings.wheelSettings, circleRadius, centerX, centerY, externalSpinFlag ? null : spinWheel);
   }
 
   // ARROW
-  const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage
-      // ? wheelSettings.wheelSettings.wheelArrowImage
-      // : './images/arrow_img.png';
+  const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage;
 
   if (arrowImageUri) {
     createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
@@ -127,13 +135,11 @@ export async function createSpinnerWheelWithAnimation(
     createArrowPointer(svg, circleRadius, centerX, centerY);
   }
 
-
   const wheelGroup = d3.select('.wheel-group');
   const spinButton = d3.select('.spin-button');
   const spinButtonText = d3.select('.spin-button-text');
   const spinButtonImage = d3.select('.spin-button-image');
   const pointerArrowGroup = d3.select('.pointer-arrow-group');
-  const borderContainer = d3.select('.border-container');
 
   async function spinWheel() {
     const randomIndex = Math.floor(Math.random() * sectionsCount);
@@ -153,41 +159,41 @@ export async function createSpinnerWheelWithAnimation(
 
     // Start the spinning animation
     await wheelGroup
-        .transition()
-        .duration(7000) // You can adjust the duration as needed
-        .ease(d3.easeBackOut.overshoot(0.3))
-        .tween('rotation', () => (t) => {
-          const rotationAngle = interpolate(t);
+      .transition()
+      .duration(7000) // You can adjust the duration as needed
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .tween('rotation', () => (t) => {
+        const rotationAngle = interpolate(t);
 
-          // Apply rotation only to the wheel group
-          wheelGroup.attr('transform', `translate(${ circleRadius + 4 },${ circleRadius + 4 }) rotate(${ rotationAngle })`);
-        })
-        .on('start', () => {
-          // Add animation to move the wheel down and scale it up
-          startSpinAnimations(
-              wheelGroup,
-              pointerArrowGroup,
-              borderContainer,
-              spinButton,
-              spinButtonText,
-              spinButtonImage,
-              targetRotation,
-              circleRadius,
-              centerX,
-              centerY,
-              screenHeight,
-              screenWidth,
-              middlePartImageUri,
-              giftValue,
-              !!arrowImageUri
-          );
-        });
+        // Apply rotation only to the wheel group
+        wheelGroup.attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY }) rotate(${ rotationAngle })`);
+      })
+      .on('start', () => {
+        // Add animation to move the wheel down and scale it up
+        startSpinAnimations(
+          wheelGroup,
+          pointerArrowGroup,
+          borderContainer,
+          spinButton,
+          spinButtonText,
+          spinButtonImage,
+          targetRotation,
+          circleRadius,
+          centerX,
+          centerY,
+          screenHeight,
+          screenWidth,
+          middlePartImageUri,
+          giftValue,
+          !!arrowImageUri
+        );
+      });
 
     setTimeout(() => {
       if (typeof onSpinComplete === 'function') {
         onSpinComplete({ isCompleted: true });
       }
-    }, 5500)
+    }, 5500);
 
   }
 
@@ -258,5 +264,5 @@ export async function createSpinnerWheelWithAnimation(
     }
   }
 
-  return { isCreated: true };
+  return { isCreated: true, spinWheel };
 }

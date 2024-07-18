@@ -18,12 +18,12 @@ export async function createArrowImage(svg, circleRadius, centerX, centerY, imag
 }
 
 export function createArrowPointer(svg, circleRadius, centerX, centerY) {
-  const width = circleRadius / 1.8;
-  const height = circleRadius / 1.8;
+  const width = circleRadius / 2.5;
+  const height = circleRadius / 2.5;
 
   const arrowGroup = svg.append('g')
       .attr('class', 'pointer-arrow-group')
-      .attr('transform', `translate(${centerX - width / 2 + 5}, ${centerY - circleRadius - height / 2 - 5})`);
+      .attr('transform', `translate(${centerX - width / 2 + 5}, ${centerY - circleRadius - height / 2 - 15})`);
 
   arrowGroup
       .append('g')

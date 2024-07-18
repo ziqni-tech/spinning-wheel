@@ -8,18 +8,21 @@ export const generatePieData = (
   svg,
   iconUris,
   tilesData,
-  sectionColors
+  sectionColors,
+  isImageMiddlePart
 ) => {
   const pie = d3.pie()
     .sort(null)
     .value(1);
+  const borderWidth = radius / 10;
+  const wheelRadius = isImageMiddlePart ? radius - borderWidth : radius;
 
   return pie(d3.range(sectionsCount)).map((d, i) => {
     return {
       id: i + 1,
       arc: d3.arc()
         .innerRadius(0)
-        .outerRadius(radius)
+        .outerRadius(wheelRadius)
         .startAngle((d, i) => (i * 2 * Math.PI) / sectionsCount)
         .endAngle((d, i) => ((i + 1) * 2 * Math.PI) / sectionsCount)(d.value, d.index),
       endAngle: d.endAngle,
