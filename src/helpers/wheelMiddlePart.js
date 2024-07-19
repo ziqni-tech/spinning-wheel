@@ -3,6 +3,7 @@ import { loadImage } from './loadImage.js';
 export function createSections(wheel, pieData, useFill = true) {
   wheel
     .append('g')
+    .attr('class', 'wheel-sections')
     .selectAll('.path-section')
     .data(pieData)
     .enter()

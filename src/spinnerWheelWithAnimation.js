@@ -9,6 +9,7 @@ import { addTextElements } from './helpers/textElements.js';
 import { createArrowImage, createArrowPointer } from './helpers/arrow.js';
 import { getSectionFill } from './helpers/getSectionFill.js';
 import { startSpinAnimations } from './helpers/startSpinAnimations.js';
+import { startUpdateButtonRotationAngle, stopUpdateButtonRotationAngle } from './helpers/updateButtonRotationAngle.js';
 
 export async function createSpinnerWheelWithAnimation(
   containerId,
@@ -45,8 +46,8 @@ export async function createSpinnerWheelWithAnimation(
   // Calling the SVG cleanup function before adding new elements
   clearSVG();
 
-  const containerWidth = boundingRect.width;
-  const containerHeight = boundingRect.height;
+  const containerWidth = screenWidth;
+  const containerHeight = screenHeight;
 
   const svg = spinnerContainer
     .append('svg')
@@ -157,6 +158,8 @@ export async function createSpinnerWheelWithAnimation(
     spinButtonText.on('click', () => null);
     spinButtonImage.on('click', () => null);
 
+    // startUpdateButtonRotationAngle();
+
     // Start the spinning animation
     await wheelGroup
       .transition()
@@ -190,11 +193,12 @@ export async function createSpinnerWheelWithAnimation(
       });
 
     setTimeout(() => {
+      // stopUpdateButtonRotationAngle();
+
       if (typeof onSpinComplete === 'function') {
         onSpinComplete({ isCompleted: true });
       }
     }, 5500);
-
   }
 
   function getFontFamilyFromClass(fontMatch) {

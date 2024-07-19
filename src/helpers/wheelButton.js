@@ -1,32 +1,31 @@
 import { loadImage } from './loadImage.js';
+import * as d3 from 'd3';
 
 export async function createWheelImageButton(svg, centerX, centerY, circleRadius, imageUrl, spinWheel) {
-  const buttonImageGroup = svg
+  const buttonImageGroup = d3.select('.wheel-group')
     .append('g')
-    .attr('class', 'spin-button');
+    .attr('class', 'spin-button')
+    .attr('transform', `rotate(${ 22 })`);
 
   const buttonSize = circleRadius / 4;
   // const buttonSize = 80;
 
-  console.log('buttonSize', buttonSize);
-  console.log('circleRadius', circleRadius);
   const image = await loadImage(imageUrl);
 
   buttonImageGroup
     .append('image')
     .attr('class', 'wheel-image-button')
-    .attr('transform', `translate(${ centerX },${ centerY })`)
     .attr('xlink:href', image.src)
     .attr('x', -buttonSize / 2)
     .attr('y', -buttonSize / 2)
-    .attr('width', buttonSize )
-    .attr('height', buttonSize )
+    .attr('width', buttonSize)
+    .attr('height', buttonSize)
     .on('click', (d, i) => {
       spinWheel();
     });
 }
 
-export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, centerY, spinWheel,) => {
+export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, centerY, spinWheel) => {
   const stopsData = [
     { offset: '3.08%', color: '#F9DF7B' },
     { offset: '21.59%', color: '#B57E10' },
@@ -60,7 +59,7 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     ? wheelSettings.spinButtonBorderColor
     : 'url(#stroke-gradient)';
 
-  const gradient = svg.append('defs')
+  const gradient = d3.select('.wheel-group').append('defs')
     .append('linearGradient')
     .attr('id', 'stroke-gradient')
     .attr('x1', '0%')
@@ -75,10 +74,10 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .attr('offset', d => d.offset)
     .attr('stop-color', d => d.color);
 
-  svg.append('rect')
+  d3.select('.wheel-group').append('rect')
     .attr('class', 'spin-button')
-    .attr('x', centerX - buttonRadius)
-    .attr('y', centerY - buttonRadius)
+    .attr('x', -buttonRadius)
+    .attr('y', -buttonRadius)
     .attr('width', buttonRadius * 2)
     .attr('height', buttonRadius * 2)
     .attr('rx', buttonRadius)
@@ -89,10 +88,11 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .style('cursor', 'default')
     .on('click', spinWheel);
 
-  const imageForeignObject = svg.append('foreignObject')
+  const imageForeignObject = d3.select('.wheel-group').append('foreignObject')
     .attr('class', 'spin-button-image')
-    .attr('x', centerX - buttonRadius)
-    .attr('y', centerY - buttonRadius)
+    .attr('x', -buttonRadius)
+    .attr('y', -buttonRadius)
+    .attr('transform', `rotate(${ 30 })`)
     .attr('width', buttonRadius * 2)
     .attr('height', buttonRadius * 2);
 
@@ -107,12 +107,13 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
       .html(`<img src="${ wheelSettings.spinButtonBackgroundImage }" width="${ buttonRadius * 2 - 3 }" height="${ buttonRadius * 2 - 3 }" style="border-radius: 50%;"/>`);
   }
 
-  svg.append('foreignObject')
+  d3.select('.wheel-group').append('foreignObject')
     .attr('class', 'spin-button-text')
-    .attr('x', centerX - buttonRadius)
-    .attr('y', centerY - buttonRadius)
+    .attr('x', -buttonRadius)
+    .attr('y', -buttonRadius)
     .attr('width', buttonRadius * 2)
     .attr('height', buttonRadius * 2 + 3)
+    .attr('transform', `rotate(${ 30 })`)
     .html((d, i) => {
       let content;
       let iconHTML = '';
