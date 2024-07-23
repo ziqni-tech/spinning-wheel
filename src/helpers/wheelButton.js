@@ -2,30 +2,41 @@ import { loadImage } from './loadImage.js';
 import * as d3 from 'd3';
 
 export async function createWheelImageButton(svg, centerX, centerY, circleRadius, imageUrl, spinWheel) {
+  const wheelGroupTransform = d3.select('.wheel-group').attr('transform');
+  const rotateMatch = /rotate\(([-\d.]+)\)/.exec(wheelGroupTransform);
+  const currentRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
+
   const buttonImageGroup = d3.select('.wheel-group')
     .append('g')
     .attr('class', 'spin-button')
-    .attr('transform', `rotate(${ 22 })`);
+    .attr('transform', `rotate(${ -currentRotation })`);
 
   const buttonSize = circleRadius / 4;
   // const buttonSize = 80;
 
   const image = await loadImage(imageUrl);
 
-  buttonImageGroup
+  const imageElement = buttonImageGroup
     .append('image')
     .attr('class', 'wheel-image-button')
     .attr('xlink:href', image.src)
     .attr('x', -buttonSize / 2)
     .attr('y', -buttonSize / 2)
     .attr('width', buttonSize)
-    .attr('height', buttonSize)
-    .on('click', (d, i) => {
+    .attr('height', buttonSize);
+
+  if (typeof spinWheel === 'function') {
+    imageElement.on('click', (d, i) => {
       spinWheel();
     });
+  }
 }
 
 export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, centerY, spinWheel) => {
+  const wheelGroupTransform = d3.select('.wheel-group').attr('transform');
+  const rotateMatch = /rotate\(([-\d.]+)\)/.exec(wheelGroupTransform);
+  const currentRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
+
   const stopsData = [
     { offset: '3.08%', color: '#F9DF7B' },
     { offset: '21.59%', color: '#B57E10' },
@@ -74,7 +85,7 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .attr('offset', d => d.offset)
     .attr('stop-color', d => d.color);
 
-  d3.select('.wheel-group').append('rect')
+  const buttonRect = d3.select('.wheel-group').append('rect')
     .attr('class', 'spin-button')
     .attr('x', -buttonRadius)
     .attr('y', -buttonRadius)
@@ -85,14 +96,17 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .attr('fill', spinButtonBackground)
     .attr('stroke', spinButtonBorderColor)
     .attr('stroke-width', 4)
-    .style('cursor', 'default')
-    .on('click', spinWheel);
+    .style('cursor', 'default');
+
+  if (typeof spinWheel === 'function') {
+    buttonRect.on('click', spinWheel);
+  }
 
   const imageForeignObject = d3.select('.wheel-group').append('foreignObject')
     .attr('class', 'spin-button-image')
     .attr('x', -buttonRadius)
     .attr('y', -buttonRadius)
-    .attr('transform', `rotate(${ 30 })`)
+    .attr('transform', `rotate(${ -currentRotation })`)
     .attr('width', buttonRadius * 2)
     .attr('height', buttonRadius * 2);
 
@@ -107,13 +121,13 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
       .html(`<img src="${ wheelSettings.spinButtonBackgroundImage }" width="${ buttonRadius * 2 - 3 }" height="${ buttonRadius * 2 - 3 }" style="border-radius: 50%;"/>`);
   }
 
-  d3.select('.wheel-group').append('foreignObject')
+  const buttonTextForeignObject = d3.select('.wheel-group').append('foreignObject')
     .attr('class', 'spin-button-text')
     .attr('x', -buttonRadius)
     .attr('y', -buttonRadius)
     .attr('width', buttonRadius * 2)
     .attr('height', buttonRadius * 2 + 3)
-    .attr('transform', `rotate(${ 30 })`)
+    .attr('transform', `rotate(${ -currentRotation })`)
     .html((d, i) => {
       let content;
       let iconHTML = '';
@@ -148,7 +162,11 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
 
       return `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: ${ buttonRadius * 2 }px; height: ${ buttonRadius * 2 }px; font-size: 10px; line-height: 12px;">${ content }</div>`;
     })
-    .style('cursor', 'default')
-    .on('click', spinWheel);
+    .style('cursor', 'default');
+
+  if (typeof spinWheel === 'function') {
+    buttonTextForeignObject.on('click', spinWheel);
+  }
 };
+
 

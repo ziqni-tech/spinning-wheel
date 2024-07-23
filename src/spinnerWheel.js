@@ -8,6 +8,7 @@ import { createWheelImageButton, wheelCenterButton } from './helpers/wheelButton
 import { addTextElements } from './helpers/textElements.js';
 import { createArrowImage, createArrowPointer } from './helpers/arrow.js';
 import { getSectionFill } from './helpers/getSectionFill.js';
+import { startUpdateButtonRotationAngle, stopUpdateButtonRotationAngle } from './helpers/updateButtonRotationAngle.js';
 
 export async function createSpinnerWheel(
   containerId,
@@ -75,11 +76,21 @@ export async function createSpinnerWheel(
     .attr('class', 'border-container')
     .attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY })`);
 
-  const pieData = generatePieData(circleRadius, tilesData.length, getSectionFill, svg, iconUris, tilesData, sectionColors);
-
-  // BORDER
+  const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
   const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
 
+  const pieData = generatePieData(
+    circleRadius,
+    tilesData.length,
+    getSectionFill,
+    svg,
+    iconUris,
+    tilesData,
+    sectionColors,
+    !!middlePartImageUri
+  );
+
+  // BORDER
   if (borderImageUrl) {
     createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
   } else {
@@ -87,8 +98,6 @@ export async function createSpinnerWheel(
   }
 
   // WHEEL SECTIONS
-  const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
-
   if (middlePartImageUri) {
     createSections(wheel, pieData, false);
     insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
@@ -141,6 +150,8 @@ export async function createSpinnerWheel(
 
     spinButton.on('click', null);
 
+    startUpdateButtonRotationAngle();
+
     // Start the spinning animation
     await wheelGroup
       .transition()
@@ -153,7 +164,7 @@ export async function createSpinnerWheel(
         wheelGroup.attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY }) rotate(${ rotationAngle })`);
       })
       .end();
-
+    stopUpdateButtonRotationAngle();
     // Mark the wheel as stopped
     const sections = wheelGroup.selectAll('.path-section');
     sections

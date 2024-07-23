@@ -12,7 +12,7 @@ function updateButtonRotationAngle() {
   const buttonImageGroup = d3.select('.spin-button');
   const buttonImage = d3.select('.spin-button-image');
   const buttonText= d3.select('.spin-button-text');
-  const buttonTransform = `rotate(${ -currentRotation - 12.5 })`;
+  const buttonTransform = `rotate(${ -currentRotation })`;
   buttonImageGroup.attr('transform', buttonTransform);
   buttonImage.attr('transform', buttonTransform);
   buttonText.attr('transform', buttonTransform);
