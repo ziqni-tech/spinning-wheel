@@ -15,9 +15,8 @@ export async function createSpinnerWheelWithAnimation(
   containerId,
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
-  prizeSection,
   onSpinComplete,
-  externalSpinFlag = false
+  externalSpinFlag = true
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -142,7 +141,7 @@ export async function createSpinnerWheelWithAnimation(
   const spinButtonImage = d3.select('.spin-button-image');
   const pointerArrowGroup = d3.select('.pointer-arrow-group');
 
-  async function spinWheel() {
+  async function spinWheel(prizeSection) {
     const randomIndex = Math.floor(Math.random() * sectionsCount);
     const giftValue = prizeSection ? prizeSection : randomIndex + 1;
 
@@ -158,7 +157,7 @@ export async function createSpinnerWheelWithAnimation(
     spinButtonText.on('click', () => null);
     spinButtonImage.on('click', () => null);
 
-    // startUpdateButtonRotationAngle();
+    startUpdateButtonRotationAngle();
 
     // Start the spinning animation
     await wheelGroup
@@ -193,13 +192,81 @@ export async function createSpinnerWheelWithAnimation(
       });
 
     setTimeout(() => {
-      // stopUpdateButtonRotationAngle();
+      stopUpdateButtonRotationAngle();
 
       if (typeof onSpinComplete === 'function') {
         onSpinComplete({ isCompleted: true });
       }
     }, 5500);
   }
+
+  function resetWheel() {
+
+    const sections = wheelGroup.selectAll('.path-section');
+    sections
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('fill', (d) => middlePartImageUri ? 'none' : d.fill)
+      .attr('stroke-width', '0')
+      .attr('stroke', 'none');
+
+    const texts = wheelGroup.selectAll('.section-text');
+    texts
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('filter', 'none');
+
+    wheelGroup
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) rotate(${startAngleFirstSection})`);
+
+    const pointerArrowGroup = d3.select('.pointer-arrow-group');
+    pointerArrowGroup
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', () => {
+        const rotationAngle = 0;
+        const arrowImageSize = circleRadius / 2.5;
+        return `translate(${centerX - arrowImageSize / 2}, ${centerY - circleRadius - arrowImageSize / 2 - 10}) rotate(${rotationAngle})`;
+      });
+
+    const borderContainer = d3.select('.border-container');
+    borderContainer
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) scale(1)`);
+
+    d3.select('.border-image-container')
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) scale(1)`);
+
+    d3.select('.spin-button')
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', `rotate(${ -startAngleFirstSection })`);
+
+    d3.select('.spin-button-image')
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', `rotate(${ -startAngleFirstSection })`);
+
+    d3.select('.spin-button-text')
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', `rotate(${ -startAngleFirstSection })`);
+  }
+
 
   function getFontFamilyFromClass(fontMatch) {
     const fontName = fontMatch[1];
@@ -268,5 +335,5 @@ export async function createSpinnerWheelWithAnimation(
     }
   }
 
-  return { isCreated: true, spinWheel };
+  return { isCreated: true, spinWheel, resetWheel };
 }

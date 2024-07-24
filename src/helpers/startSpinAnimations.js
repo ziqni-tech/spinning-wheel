@@ -107,13 +107,13 @@ function animateWheelSections(wheelGroup, giftValue, middlePartImageUri) {
     .delay(4500)
     .attr('fill', (d, i) => {
       const fill = middlePartImageUri ? 'none' : d.fill;
-      return i + 1 !== giftValue ? 'rgba(0, 0, 0, 0.7)' : fill;
+      return d.id !== giftValue ? 'rgba(0, 0, 0, 0.7)' : fill;
     })
-    .attr('stroke-width', (d, i) => i + 1 === giftValue ? '5' : '0')
-    .attr('stroke', (d, i) => i + 1 === giftValue ? '' : '');
+    .attr('stroke-width', (d, i) => d.id === giftValue ? '5' : '0')
+    .attr('stroke', (d, i) => d.id === giftValue ? '' : '');
 
   sections
-    .filter((d, i) => i + 1 === giftValue)
+    .filter((d, i) => d.id === giftValue)
     .raise();
 
   const texts = wheelGroup.selectAll('.section-text');
@@ -122,7 +122,7 @@ function animateWheelSections(wheelGroup, giftValue, middlePartImageUri) {
     .duration(1000)
     .ease(d3.easeBackOut.overshoot(0.3))
     .delay(4000)
-    .attr('filter', (d, i) => i + 1 !== giftValue ? 'blur(3px)' : 'none');
+    .attr('filter', (d, i) => d.id !== giftValue ? 'blur(3px)' : 'none');
 }
 
 // Function for animation that starts when rotation starts

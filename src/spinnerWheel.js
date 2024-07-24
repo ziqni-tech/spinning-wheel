@@ -14,9 +14,8 @@ export async function createSpinnerWheel(
   containerId,
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
-  prizeSection,
   onSpinComplete,
-  externalSpinFlag = false
+  externalSpinFlag = true
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -137,7 +136,7 @@ export async function createSpinnerWheel(
   const wheelGroup = d3.select('.wheel-group');
   const spinButton = d3.select('.spin-button');
 
-  async function spinWheel() {
+  async function spinWheel(prizeSection) {
     const randomIndex = Math.floor(Math.random() * sectionsCount);
     const giftValue = prizeSection ? prizeSection : randomIndex + 1;
     const sliceWidth = 360 / sectionsCount;
@@ -170,15 +169,17 @@ export async function createSpinnerWheel(
     sections
       .attr('fill', (d, i) => {
         const fill = middlePartImageUri ? 'none' : d.fill;
-        return i + 1 !== giftValue ? 'rgba(0, 0, 0, 0.7)' : fill;
+        return d.id !== giftValue ? 'rgba(0, 0, 0, 0.7)' : fill;
       })
-      .attr('stroke-width', (d, i) => i + 1 === giftValue ? '5' : '0')
-      .attr('stroke', (d, i) => i + 1 === giftValue ? '#EE3EC8' : '#8D0C71');
+      .attr('stroke-width', (d, i) => {
+        return d.id === giftValue ? '5' : '0';
+      })
+      .attr('stroke', (d, i) => d.id === giftValue ? '#EE3EC8' : '#8D0C71');
 
     const texts = wheelGroup.selectAll('.section-text');
 
     texts
-      .attr('filter', (d, i) => i + 1 !== giftValue ? 'blur(3px)' : 'none');
+      .attr('filter', (d, i) => d.id !== giftValue ? 'blur(3px)' : 'none');
 
     // Bring the winning section to the front
     sections
@@ -190,9 +191,29 @@ export async function createSpinnerWheel(
     }
   }
 
-
   const resetWheel = () => {
-    window.location.reload();
+    const sections = wheelGroup.selectAll('.path-section');
+    sections
+      .attr('fill', (d) => {
+        return middlePartImageUri ? 'none' : d.fill;
+      })
+      .attr('stroke-width', '0')
+      .attr('stroke', 'none');
+
+    const texts = wheelGroup.selectAll('.section-text');
+    texts.attr('filter', 'none');
+
+    // Reset the wheel rotation to its initial position
+    wheelGroup.attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) rotate(${startAngleFirstSection})`);
+
+    const wheelGroupTransform = d3.select('.wheel-group').attr('transform');
+    const rotateMatch = /rotate\(([-\d.]+)\)/.exec(wheelGroupTransform);
+    const currentRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
+
+    // Re-enable the spin button if it was disabled
+    spinButton
+      .attr('transform', `rotate(${ -currentRotation })`)
+      .on('click', spinWheel);
   };
 
   function getFontFamilyFromClass(fontMatch) {
@@ -262,5 +283,5 @@ export async function createSpinnerWheel(
     }
   }
 
-  return { isCreated: true, spinWheel };
+  return { isCreated: true, spinWheel, resetWheel };
 }

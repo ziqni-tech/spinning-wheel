@@ -108,7 +108,8 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .attr('y', -buttonRadius)
     .attr('transform', `rotate(${ -currentRotation })`)
     .attr('width', buttonRadius * 2)
-    .attr('height', buttonRadius * 2);
+    .attr('height', buttonRadius * 2)
+    .style('pointer-events', 'none');
 
   if (typeof wheelSettings.spinButtonBackgroundImage === 'string' && wheelSettings.spinButtonBackgroundImage !== '') {
     imageForeignObject.append('xhtml:div')
@@ -118,6 +119,7 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
       .style('align-items', 'center')
       .style('width', buttonRadius * 2 + 'px')
       .style('height', buttonRadius * 2 + 'px')
+      .style('pointer-events', 'none')
       .html(`<img src="${ wheelSettings.spinButtonBackgroundImage }" width="${ buttonRadius * 2 - 3 }" height="${ buttonRadius * 2 - 3 }" style="border-radius: 50%;"/>`);
   }
 
@@ -162,6 +164,7 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
 
       return `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: ${ buttonRadius * 2 }px; height: ${ buttonRadius * 2 }px; font-size: 10px; line-height: 12px;">${ content }</div>`;
     })
+    .style('pointer-events', 'none')
     .style('cursor', 'default');
 
   if (typeof spinWheel === 'function') {
