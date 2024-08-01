@@ -1,15 +1,10 @@
 import { loadImage } from './loadImage.js';
 import * as d3 from 'd3';
 
-export async function createWheelImageButton(svg, centerX, centerY, circleRadius, imageUrl, spinWheel) {
-  const wheelGroupTransform = d3.select('.wheel-group').attr('transform');
-  const rotateMatch = /rotate\(([-\d.]+)\)/.exec(wheelGroupTransform);
-  const currentRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
-
-  const buttonImageGroup = d3.select('.wheel-group')
+export async function createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, imageUrl) {
+  const buttonImageGroup = buttonContainer
     .append('g')
     .attr('class', 'spin-button')
-    .attr('transform', `rotate(${ -currentRotation })`);
 
   const buttonSize = circleRadius / 4;
   // const buttonSize = 80;
@@ -25,18 +20,9 @@ export async function createWheelImageButton(svg, centerX, centerY, circleRadius
     .attr('width', buttonSize)
     .attr('height', buttonSize);
 
-  if (typeof spinWheel === 'function') {
-    imageElement.on('click', (d, i) => {
-      spinWheel();
-    });
-  }
 }
 
-export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, centerY, spinWheel) => {
-  const wheelGroupTransform = d3.select('.wheel-group').attr('transform');
-  const rotateMatch = /rotate\(([-\d.]+)\)/.exec(wheelGroupTransform);
-  const currentRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
-
+export const wheelCenterButton = (buttonContainer, wheelSettings, circleRadius) => {
   const stopsData = [
     { offset: '3.08%', color: '#F9DF7B' },
     { offset: '21.59%', color: '#B57E10' },
@@ -70,7 +56,7 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     ? wheelSettings.spinButtonBorderColor
     : 'url(#stroke-gradient)';
 
-  const gradient = d3.select('.wheel-group').append('defs')
+  const gradient = buttonContainer.append('defs')
     .append('linearGradient')
     .attr('id', 'stroke-gradient')
     .attr('x1', '0%')
@@ -85,7 +71,7 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .attr('offset', d => d.offset)
     .attr('stop-color', d => d.color);
 
-  const buttonRect = d3.select('.wheel-group').append('rect')
+  const buttonRect = buttonContainer.append('rect')
     .attr('class', 'spin-button')
     .attr('x', -buttonRadius)
     .attr('y', -buttonRadius)
@@ -98,15 +84,10 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .attr('stroke-width', 4)
     .style('cursor', 'default');
 
-  if (typeof spinWheel === 'function') {
-    buttonRect.on('click', spinWheel);
-  }
-
-  const imageForeignObject = d3.select('.wheel-group').append('foreignObject')
+  const imageForeignObject = buttonContainer.append('foreignObject')
     .attr('class', 'spin-button-image')
     .attr('x', -buttonRadius)
     .attr('y', -buttonRadius)
-    .attr('transform', `rotate(${ -currentRotation })`)
     .attr('width', buttonRadius * 2)
     .attr('height', buttonRadius * 2)
     .style('pointer-events', 'none');
@@ -123,13 +104,12 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
       .html(`<img src="${ wheelSettings.spinButtonBackgroundImage }" width="${ buttonRadius * 2 - 3 }" height="${ buttonRadius * 2 - 3 }" style="border-radius: 50%;"/>`);
   }
 
-  const buttonTextForeignObject = d3.select('.wheel-group').append('foreignObject')
+  const buttonTextForeignObject = buttonContainer.append('foreignObject')
     .attr('class', 'spin-button-text')
     .attr('x', -buttonRadius)
     .attr('y', -buttonRadius)
     .attr('width', buttonRadius * 2)
     .attr('height', buttonRadius * 2 + 3)
-    .attr('transform', `rotate(${ -currentRotation })`)
     .html((d, i) => {
       let content;
       let iconHTML = '';
@@ -167,9 +147,6 @@ export const wheelCenterButton = (svg, wheelSettings, circleRadius, centerX, cen
     .style('pointer-events', 'none')
     .style('cursor', 'default');
 
-  if (typeof spinWheel === 'function') {
-    buttonTextForeignObject.on('click', spinWheel);
-  }
 };
 
 

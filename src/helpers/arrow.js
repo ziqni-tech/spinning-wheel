@@ -1,7 +1,7 @@
 import { loadImage } from './loadImage.js';
 
 export async function createArrowImage(svg, circleRadius, centerX, centerY, imageUrl) {
-  const imageSize = circleRadius / 2.5;
+  const imageSize = circleRadius / 3;
 
   const arrowGroup = svg.append('g')
     .attr('class', 'pointer-arrow-group')

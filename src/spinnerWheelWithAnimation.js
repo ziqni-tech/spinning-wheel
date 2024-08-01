@@ -9,14 +9,12 @@ import { addTextElements } from './helpers/textElements.js';
 import { createArrowImage, createArrowPointer } from './helpers/arrow.js';
 import { getSectionFill } from './helpers/getSectionFill.js';
 import { startSpinAnimations } from './helpers/startSpinAnimations.js';
-import { startUpdateButtonRotationAngle, stopUpdateButtonRotationAngle } from './helpers/updateButtonRotationAngle.js';
 
 export async function createSpinnerWheelWithAnimation(
   containerId,
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
-  externalSpinFlag = true
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -77,6 +75,10 @@ export async function createSpinnerWheelWithAnimation(
     .attr('class', 'border-container')
     .attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY })`);
 
+  const buttonContainer = svg.append('g')
+    .attr('class', 'button-container')
+    .attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY })`);
+
   const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
   const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
 
@@ -93,7 +95,7 @@ export async function createSpinnerWheelWithAnimation(
 
   // BORDER
   if (borderImageUrl) {
-    createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
+    await createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
   } else {
     createWheelBorder(svg, borderContainer, circleRadius, wheelSettings.wheelSettings);
   }
@@ -101,7 +103,7 @@ export async function createSpinnerWheelWithAnimation(
   // WHEEL SECTIONS
   if (middlePartImageUri) {
     createSections(wheel, pieData, false);
-    insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
+    await insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
   } else {
     createSections(wheel, pieData);
   }
@@ -121,16 +123,16 @@ export async function createSpinnerWheelWithAnimation(
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
   if (buttonImageUri) {
-    createWheelImageButton(svg, centerX, centerY, circleRadius, buttonImageUri, externalSpinFlag ? null : spinWheel);
+    await createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, buttonImageUri);
   } else {
-    wheelCenterButton(svg, wheelSettings.wheelSettings, circleRadius, centerX, centerY, externalSpinFlag ? null : spinWheel);
+    wheelCenterButton(buttonContainer, wheelSettings.wheelSettings, circleRadius);
   }
 
   // ARROW
   const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage;
 
   if (arrowImageUri) {
-    createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
+    await createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
   } else {
     createArrowPointer(svg, circleRadius, centerX, centerY);
   }
@@ -156,8 +158,6 @@ export async function createSpinnerWheelWithAnimation(
     spinButton.on('click', () => null);
     spinButtonText.on('click', () => null);
     spinButtonImage.on('click', () => null);
-
-    startUpdateButtonRotationAngle();
 
     // Start the spinning animation
     await wheelGroup
@@ -192,7 +192,6 @@ export async function createSpinnerWheelWithAnimation(
       });
 
     setTimeout(() => {
-      stopUpdateButtonRotationAngle();
 
       if (typeof onSpinComplete === 'function') {
         onSpinComplete({ isCompleted: true });
@@ -248,23 +247,12 @@ export async function createSpinnerWheelWithAnimation(
       .ease(d3.easeBackOut.overshoot(0.3))
       .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) scale(1)`);
 
-    d3.select('.spin-button')
+    d3.select('.button-container')
       .transition()
       .duration(1000)
       .ease(d3.easeBackOut.overshoot(0.3))
-      .attr('transform', `rotate(${ -startAngleFirstSection })`);
+      .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) scale(1)`);
 
-    d3.select('.spin-button-image')
-      .transition()
-      .duration(1000)
-      .ease(d3.easeBackOut.overshoot(0.3))
-      .attr('transform', `rotate(${ -startAngleFirstSection })`);
-
-    d3.select('.spin-button-text')
-      .transition()
-      .duration(1000)
-      .ease(d3.easeBackOut.overshoot(0.3))
-      .attr('transform', `rotate(${ -startAngleFirstSection })`);
   }
 
 

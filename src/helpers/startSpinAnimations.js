@@ -33,7 +33,7 @@ function animatePointerArrowGroup(
     .attr('transform', () => {
       const rotationAngle = -15;
       const radians = rotationAngle * Math.PI / 180;
-      const xOffset = circleRadius * Math.sin(radians) / 2;
+      const xOffset = circleRadius * Math.sin(radians) / 2 + 10;
 
       return `translate(${ centerX - arrowImageSize / 2 + xOffset }, ${ centerY - circleRadius - arrowImageSize / 2 - 10 }) rotate(${ rotationAngle })`;
     });
@@ -48,6 +48,15 @@ function animateBorderContainer(
   screenHeight
 ) {
   borderContainer
+    .transition()
+    .duration(1000)
+    .ease(d3.easeBackOut.overshoot(0.3))
+    .delay(4000)
+    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / 6) }) scale(1.8)`);
+}
+
+function animateButtonContainer(centerX, centerY, screenHeight) {
+  d3.select('.button-container')
     .transition()
     .duration(1000)
     .ease(d3.easeBackOut.overshoot(0.3))
@@ -87,7 +96,7 @@ function animatePointerArrowGroupEnd(
     .attr('transform', () => {
       const rotationAngle = 0;
       const newOffsetX = isPointerArrowImage
-        ? centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize
+        ? centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize + 15
         : centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize + 20;
       const newOffsetY = isPointerArrowImage
         ? centerY + (screenHeight / 6) - circleRadius * 1.8 - arrowImageSize / 2 - 56
@@ -146,6 +155,7 @@ export function startSpinAnimations(
   animateWheelGroup(wheelGroup, centerX, centerY, targetRotation, circleRadius, screenHeight);
   animatePointerArrowGroup(pointerArrowGroup, circleRadius, centerX, centerY);
   animateBorderContainer(borderContainer, centerX, centerY, circleRadius, screenHeight);
+  animateButtonContainer(centerX, centerY, screenHeight);
   animateBorderImageContainer(circleRadius, centerX, centerY, screenHeight);
   animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight, isPointerArrowImage);
   animateWheelSections(wheelGroup, giftValue, middlePartImageUri);

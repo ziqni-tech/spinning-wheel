@@ -8,14 +8,12 @@ import { createWheelImageButton, wheelCenterButton } from './helpers/wheelButton
 import { addTextElements } from './helpers/textElements.js';
 import { createArrowImage, createArrowPointer } from './helpers/arrow.js';
 import { getSectionFill } from './helpers/getSectionFill.js';
-import { startUpdateButtonRotationAngle, stopUpdateButtonRotationAngle } from './helpers/updateButtonRotationAngle.js';
 
 export async function createSpinnerWheel(
   containerId,
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
-  externalSpinFlag = true
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -75,6 +73,10 @@ export async function createSpinnerWheel(
     .attr('class', 'border-container')
     .attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY })`);
 
+  const buttonContainer = svg.append('g')
+    .attr('class', 'button-container')
+    .attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY })`);
+
   const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
   const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
 
@@ -91,7 +93,7 @@ export async function createSpinnerWheel(
 
   // BORDER
   if (borderImageUrl) {
-    createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
+    await createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
   } else {
     createWheelBorder(svg, borderContainer, circleRadius, wheelSettings.wheelSettings);
   }
@@ -99,7 +101,7 @@ export async function createSpinnerWheel(
   // WHEEL SECTIONS
   if (middlePartImageUri) {
     createSections(wheel, pieData, false);
-    insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
+    await insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
   } else {
     createSections(wheel, pieData);
   }
@@ -119,9 +121,9 @@ export async function createSpinnerWheel(
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
   if (buttonImageUri) {
-    createWheelImageButton(svg, centerX, centerY, circleRadius, buttonImageUri, externalSpinFlag ? null : spinWheel);
+    await createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, buttonImageUri);
   } else {
-    wheelCenterButton(svg, wheelSettings.wheelSettings, circleRadius, centerX, centerY, externalSpinFlag ? null : spinWheel);
+    wheelCenterButton(buttonContainer, wheelSettings.wheelSettings, circleRadius);
   }
 
   // ARROW
@@ -149,8 +151,6 @@ export async function createSpinnerWheel(
 
     spinButton.on('click', null);
 
-    startUpdateButtonRotationAngle();
-
     // Start the spinning animation
     await wheelGroup
       .transition()
@@ -163,7 +163,7 @@ export async function createSpinnerWheel(
         wheelGroup.attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY }) rotate(${ rotationAngle })`);
       })
       .end();
-    stopUpdateButtonRotationAngle();
+
     // Mark the wheel as stopped
     const sections = wheelGroup.selectAll('.path-section');
     sections
@@ -206,14 +206,6 @@ export async function createSpinnerWheel(
     // Reset the wheel rotation to its initial position
     wheelGroup.attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) rotate(${startAngleFirstSection})`);
 
-    const wheelGroupTransform = d3.select('.wheel-group').attr('transform');
-    const rotateMatch = /rotate\(([-\d.]+)\)/.exec(wheelGroupTransform);
-    const currentRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
-
-    // Re-enable the spin button if it was disabled
-    spinButton
-      .attr('transform', `rotate(${ -currentRotation })`)
-      .on('click', spinWheel);
   };
 
   function getFontFamilyFromClass(fontMatch) {
