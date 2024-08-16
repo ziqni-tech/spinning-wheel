@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 export function addTextElements(
   wheel,
   pieData,
@@ -5,7 +7,8 @@ export function addTextElements(
   circleRadius,
   getHeightFromHeader,
   getFontFamilyFromClass,
-  getSvgTextAnchor
+  getSvgTextAnchor,
+  isCardPreview
 ) {
 
   const sectionsCount = tilesData.length;
@@ -30,8 +33,7 @@ export function addTextElements(
     })
     .attr('height', (d, i) => {
       const tileText = tilesData[i].text;
-
-      return getHeightFromHeader(tileText);
+      return  getHeightFromHeader(tileText);
     })
     .style('white-space', 'nowrap')
     .style('overflow', 'visible')
@@ -59,10 +61,21 @@ export function addTextElements(
     .attr('class', 'text-block')
     .style('width', circleRadius)
     .style('height', '100%')
+    .style('display', 'flex')
+    .style('align-items', (d, i) => {
+      const isVerticallyText = tilesData[i].contraints && tilesData[i].contraints.includes('isVerticallyText');
+      return isCardPreview && tilesData[i].text && isVerticallyText ? 'center' : ''
+    } ) // Center vertically
+    .style('justify-content', 'center') // Center horizontally
     .style('padding-left', (d, i) => {
       const isVerticallyText = tilesData[i].contraints && tilesData[i].contraints.includes('isVerticallyText');
 
-      return tilesData[i].text && isVerticallyText ? '25px' : '15px';
+      return isCardPreview && tilesData[i].text && isVerticallyText ? '18px' : tilesData[i].text && isVerticallyText ? '25px' : '15px';
+    })
+    .style('padding-top', (d, i) => {
+      const isVerticallyText = tilesData[i].contraints && tilesData[i].contraints.includes('isVerticallyText');
+
+      return tilesData[i].text && isVerticallyText && isCardPreview ? '5px' : '';
     })
     .style('padding-right', '15px')
     .style('margin', '0')
@@ -78,6 +91,10 @@ export function addTextElements(
       const fontMatch = tileText.match(/class="ql-font-(\w+)"/);
 
       if (fontMatch) getFontFamilyFromClass(fontMatch);
+    })
+    .style('font-size', (d, i) => {
+      const height = isCardPreview ? 5 : parseInt(d3.select(`#section-${i + 1}`).style('height'), 10);
+      return `${height}px`;
     })
     .html((d, i) => {
       let content = tilesData[i].text;

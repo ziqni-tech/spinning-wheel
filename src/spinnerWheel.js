@@ -14,6 +14,7 @@ export async function createSpinnerWheel(
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
+  isCardPreview = false
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -114,7 +115,8 @@ export async function createSpinnerWheel(
     circleRadius,
     getHeightFromHeader,
     getFontFamilyFromClass,
-    getSvgTextAnchor
+    getSvgTextAnchor,
+    isCardPreview
   );
 
   // BUTTON
@@ -130,9 +132,9 @@ export async function createSpinnerWheel(
   const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage;
 
   if (arrowImageUri) {
-    createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
+    if (!isCardPreview) createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
   } else {
-    createArrowPointer(svg, circleRadius, centerX, centerY);
+    if (!isCardPreview) createArrowPointer(svg, circleRadius, centerX, centerY);
   }
 
   const wheelGroup = d3.select('.wheel-group');
