@@ -1,5 +1,5 @@
 {
-  "name": "spinning-wheel",
+  "name": "@ziqni-tech/spinning-wheel",
   "version": "1.0.0",
   "description": "",
   "main": "dist/bundle.js",
