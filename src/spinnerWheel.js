@@ -125,7 +125,7 @@ export async function createSpinnerWheel(
   if (buttonImageUri) {
     await createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, buttonImageUri);
   } else {
-    wheelCenterButton(buttonContainer, wheelSettings.wheelSettings, circleRadius);
+    wheelCenterButton(buttonContainer, wheelSettings.wheelSettings, circleRadius, isCardPreview);
   }
 
   // ARROW

@@ -22,7 +22,7 @@ export async function createWheelImageButton(buttonContainer, centerX, centerY, 
 
 }
 
-export const wheelCenterButton = (buttonContainer, wheelSettings, circleRadius) => {
+export const wheelCenterButton = (buttonContainer, wheelSettings, circleRadius, isCardPreview) => {
   const stopsData = [
     { offset: '3.08%', color: '#F9DF7B' },
     { offset: '21.59%', color: '#B57E10' },
@@ -81,7 +81,7 @@ export const wheelCenterButton = (buttonContainer, wheelSettings, circleRadius) 
     .attr('ry', buttonRadius)
     .attr('fill', spinButtonBackground)
     .attr('stroke', spinButtonBorderColor)
-    .attr('stroke-width', 4)
+    .attr('stroke-width', () => isCardPreview ? 1 : 4)
     .style('cursor', 'default');
 
   const imageForeignObject = buttonContainer.append('foreignObject')
@@ -142,7 +142,10 @@ export const wheelCenterButton = (buttonContainer, wheelSettings, circleRadius) 
         content = content.replace(/<h6/g, '<h6 style="margin: 0;"');
       }
 
-      return `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: ${ buttonRadius * 2 }px; height: ${ buttonRadius * 2 }px; font-size: 10px; line-height: 12px;">${ content }</div>`;
+      const fontSize = isCardPreview ? '4px' : '10px';
+      const lineHeight = isCardPreview ? '4px' : '12px';
+
+      return `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: ${ buttonRadius * 2 }px; height: ${ buttonRadius * 2 }px; font-size: ${ fontSize }; line-height: ${ lineHeight };">${ content }</div>`;
     })
     .style('pointer-events', 'none')
     .style('cursor', 'default');
