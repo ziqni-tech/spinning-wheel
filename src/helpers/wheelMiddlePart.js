@@ -19,7 +19,7 @@ export function createSections(wheel, pieData, useFill = true) {
 export const insertWheelImage = async (wheel, imageUrl, circleRadius, sectionsCount) => {
   const borderWidth = circleRadius / 10 * 2;
   const angleOffset = 360 / (2 * sectionsCount);
-  const imageSize = circleRadius * 2 - borderWidth;
+  const imageSize = circleRadius * 2 - borderWidth + 15;
   const image = await loadImage(imageUrl);
 
   wheel

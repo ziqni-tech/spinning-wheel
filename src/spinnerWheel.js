@@ -137,8 +137,8 @@ export async function createSpinnerWheel(
     if (!isCardPreview) createArrowPointer(svg, circleRadius, centerX, centerY);
   }
 
-  const wheelGroup = d3.select('.wheel-group');
-  const spinButton = d3.select('.spin-button');
+  const wheelGroup = spinnerContainer.select('.wheel-group');
+  const spinButton = spinnerContainer.select('.spin-button');
 
   async function spinWheel(prizeSection) {
     const randomIndex = Math.floor(Math.random() * sectionsCount);
