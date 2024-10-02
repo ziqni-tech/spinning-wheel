@@ -37,7 +37,7 @@ export async function createSpinnerWheel(
 
   // Cleaning up SVG before adding new elements
   function clearSVG() {
-    d3.select('#spinner-container').select('svg').remove();
+    d3.select(containerId).select('svg').remove();
   }
 
   // Calling the SVG cleanup function before adding new elements
