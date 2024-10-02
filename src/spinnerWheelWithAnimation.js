@@ -137,8 +137,8 @@ export async function createSpinnerWheelWithAnimation(
     createArrowPointer(svg, circleRadius, centerX, centerY);
   }
 
-  const wheelGroup = d3.select('.wheel-group');
-  const spinButton = d3.select('.spin-button');
+  const wheelGroup = spinnerContainer.select('.wheel-group');
+  const spinButton = spinnerContainer.select('.spin-button');
   const spinButtonText = d3.select('.spin-button-text');
   const spinButtonImage = d3.select('.spin-button-image');
   const pointerArrowGroup = d3.select('.pointer-arrow-group');
