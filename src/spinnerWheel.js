@@ -81,8 +81,10 @@ export async function createSpinnerWheel(
   const middlePartImageUri = wheelSettings.wheelSettings.wheelImage;
   const borderImageUrl = wheelSettings.wheelSettings.wheelBorderImage;
 
+  const radiusAdjustedForPreview = isCardPreview ? circleRadius - 4 : circleRadius;
+
   const pieData = generatePieData(
-    circleRadius,
+    radiusAdjustedForPreview,
     tilesData.length,
     getSectionFill,
     svg,
@@ -96,7 +98,7 @@ export async function createSpinnerWheel(
   if (borderImageUrl) {
     await createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
   } else {
-    createWheelBorder(svg, borderContainer, circleRadius, wheelSettings.wheelSettings);
+    createWheelBorder(svg, borderContainer, radiusAdjustedForPreview, wheelSettings.wheelSettings);
   }
 
   // WHEEL SECTIONS
