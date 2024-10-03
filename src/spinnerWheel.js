@@ -22,7 +22,7 @@ export async function createSpinnerWheel(
   const screenWidth = boundingRect.width;
   const screenHeight = boundingRect.height;
   const minDimension = Math.min(screenWidth, screenHeight);
-  const circleRadius = minDimension / 3.5;
+  const circleRadius = minDimension / 2.5;
 
   const iconUris = tilesData.map(tile => {
     const hasId = /\/_id\/[a-zA-Z0-9_-]+/.test(tile.iconLink);
@@ -102,7 +102,7 @@ export async function createSpinnerWheel(
   // WHEEL SECTIONS
   if (middlePartImageUri) {
     createSections(wheel, pieData, false);
-    await insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
+    await insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length, isCardPreview);
   } else {
     createSections(wheel, pieData);
   }
@@ -167,26 +167,28 @@ export async function createSpinnerWheel(
       .end();
 
     // Mark the wheel as stopped
-    const sections = wheelGroup.selectAll('.path-section');
-    sections
-      .attr('fill', (d, i) => {
-        const fill = middlePartImageUri ? 'none' : d.fill;
-        return d.id !== giftValue ? 'rgba(0, 0, 0, 0.7)' : fill;
-      })
-      .attr('stroke-width', (d, i) => {
-        return d.id === giftValue ? '5' : '0';
-      })
-      .attr('stroke', (d, i) => d.id === giftValue ? '#EE3EC8' : '#8D0C71');
+    // First we raise the winning section to the top
+    wheelGroup.selectAll('.path-section')
+      .each(function (d) {
+        const section = d3.select(this);
+        if (d.id === giftValue) {
+          section.raise();
+        }
+      });
 
-    const texts = wheelGroup.selectAll('.section-text');
+    // Then add masks for the remaining sections
+    wheelGroup.selectAll('.path-section')
+      .each(function (d) {
+        const section = d3.select(this);
 
-    texts
-      .attr('filter', (d, i) => d.id !== giftValue ? 'blur(3px)' : 'none');
-
-    // Bring the winning section to the front
-    sections
-      .filter((d, i) => i + 1 === giftValue)
-      .raise();
+        wheelGroup.append('path')
+          .attr('class', 'global-mask-overlay')
+          .attr('d', section.attr('d'))
+          .attr('fill', d.id !== giftValue ? 'rgba(0, 0, 0, 0.7)' : 'none')
+          .attr('pointer-events', 'none')
+          .attr('stroke', d.id !== giftValue ? 'none' : '#EE3EC8')
+          .attr('stroke-width', d.id !== giftValue ? '0' : '8');
+      });
 
     if (typeof onSpinComplete === 'function') {
       onSpinComplete({ isCompleted: true });
@@ -194,6 +196,8 @@ export async function createSpinnerWheel(
   }
 
   const resetWheel = () => {
+    wheelGroup.selectAll('.global-mask-overlay').remove();
+
     const sections = wheelGroup.selectAll('.path-section');
     sections
       .attr('fill', (d) => {
@@ -206,8 +210,7 @@ export async function createSpinnerWheel(
     texts.attr('filter', 'none');
 
     // Reset the wheel rotation to its initial position
-    wheelGroup.attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) rotate(${startAngleFirstSection})`);
-
+    wheelGroup.attr('transform', `translate(${ viewBoxCenterX },${ viewBoxCenterY }) rotate(${ startAngleFirstSection })`);
   };
 
   function getFontFamilyFromClass(fontMatch) {
