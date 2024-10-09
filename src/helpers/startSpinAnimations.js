@@ -108,30 +108,32 @@ function animatePointerArrowGroupEnd(
 
 // Animation for wheel sections
 function animateWheelSections(wheelGroup, giftValue, middlePartImageUri) {
-  const sections = wheelGroup.selectAll('.path-section');
-  sections
-    .transition()
-    .duration(1000)
-    .ease(d3.easeBackOut.overshoot(0.3))
-    .delay(4500)
-    .attr('fill', (d, i) => {
-      const fill = middlePartImageUri ? 'none' : d.fill;
-      return d.id !== giftValue ? 'rgba(0, 0, 0, 0.7)' : fill;
-    })
-    .attr('stroke-width', (d, i) => d.id === giftValue ? '5' : '0')
-    .attr('stroke', (d, i) => d.id === giftValue ? '' : '');
 
-  sections
-    .filter((d, i) => d.id === giftValue)
-    .raise();
+  wheelGroup.selectAll('.path-section')
+    .each(function (d) {
+      const section = d3.select(this);
+      if (d.id === giftValue) {
+        section.raise();
+      }
+    });
 
-  const texts = wheelGroup.selectAll('.section-text');
-  texts
-    .transition()
-    .duration(1000)
-    .ease(d3.easeBackOut.overshoot(0.3))
-    .delay(4000)
-    .attr('filter', (d, i) => d.id !== giftValue ? 'blur(3px)' : 'none');
+  // Then add masks for the remaining sections
+  wheelGroup.selectAll('.path-section')
+    .each(function (d) {
+      const section = d3.select(this);
+
+      wheelGroup.append('path')
+        .transition()
+        .duration(1000)
+        .ease(d3.easeBackOut.overshoot(0.3))
+        .delay(4500)
+        .attr('class', 'global-mask-overlay')
+        .attr('d', section.attr('d'))
+        .attr('fill', d.id !== giftValue ? 'rgba(0, 0, 0, 0.7)' : 'none')
+        .attr('pointer-events', 'none')
+        .attr('stroke', d.id !== giftValue ? 'none' : '#EE3EC8')
+        .attr('stroke-width', d.id !== giftValue ? '0' : '8');
+    });
 }
 
 // Function for animation that starts when rotation starts

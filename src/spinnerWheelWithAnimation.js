@@ -200,22 +200,7 @@ export async function createSpinnerWheelWithAnimation(
   }
 
   function resetWheel() {
-
-    const sections = wheelGroup.selectAll('.path-section');
-    sections
-      .transition()
-      .duration(1000)
-      .ease(d3.easeBackOut.overshoot(0.3))
-      .attr('fill', (d) => middlePartImageUri ? 'none' : d.fill)
-      .attr('stroke-width', '0')
-      .attr('stroke', 'none');
-
-    const texts = wheelGroup.selectAll('.section-text');
-    texts
-      .transition()
-      .duration(1000)
-      .ease(d3.easeBackOut.overshoot(0.3))
-      .attr('filter', 'none');
+    wheelGroup.selectAll('.global-mask-overlay').remove();
 
     wheelGroup
       .transition()
