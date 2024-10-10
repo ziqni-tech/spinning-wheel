@@ -15,6 +15,7 @@ export async function createSpinnerWheelWithAnimation(
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
+  onScaleAnimationStart
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -22,7 +23,7 @@ export async function createSpinnerWheelWithAnimation(
   const screenWidth = boundingRect.width;
   const screenHeight = boundingRect.height;
   const minDimension = Math.min(screenWidth, screenHeight);
-  const circleRadius = minDimension / 3.5;
+  const circleRadius = minDimension / 2.7;
 
   const iconUris = tilesData.map(tile => {
     const hasId = /\/_id\/[a-zA-Z0-9_-]+/.test(tile.iconLink);
@@ -192,6 +193,12 @@ export async function createSpinnerWheelWithAnimation(
       });
 
     setTimeout(() => {
+      if (typeof onScaleAnimationStart === 'function') {
+        onScaleAnimationStart({ message: 'Spin animation started' });
+      }
+    }, 4000)
+
+    setTimeout(() => {
 
       if (typeof onSpinComplete === 'function') {
         onSpinComplete({ isCompleted: true });
@@ -216,7 +223,8 @@ export async function createSpinnerWheelWithAnimation(
       .attr('transform', () => {
         const rotationAngle = 0;
         const arrowImageSize = circleRadius / 2.5;
-        return `translate(${centerX - arrowImageSize / 2}, ${centerY - circleRadius - arrowImageSize / 2 - 10}) rotate(${rotationAngle})`;
+        const adjustment = arrowImageUri ? 10 : 25;
+        return `translate(${centerX - arrowImageSize / 2}, ${centerY - circleRadius - arrowImageSize / 2 - adjustment}) rotate(${rotationAngle})`;
       });
 
     const borderContainer = d3.select('.border-container');

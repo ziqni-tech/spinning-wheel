@@ -23,7 +23,7 @@ export function createArrowPointer(svg, circleRadius, centerX, centerY) {
 
   const arrowGroup = svg.append('g')
       .attr('class', 'pointer-arrow-group')
-      .attr('transform', `translate(${centerX - width / 2 + 5}, ${centerY - circleRadius - height / 2 - 15})`);
+      .attr('transform', `translate(${centerX - width / 2 + 5}, ${centerY - circleRadius - height / 2 - 25})`);
 
   arrowGroup
       .append('g')
