@@ -16,11 +16,11 @@ export function createSections(wheel, pieData, useFill = true) {
     .attr('stroke-width', (d) => d.strokeWidth);
 }
 
-export const insertWheelImage = async (wheel, imageUrl, circleRadius, sectionsCount, isCardPreview) => {
+export const insertWheelImage = async (wheel, imageUrl, circleRadius, sectionsCount, isCardPreview, isWheelWithoutBorder) => {
   const borderWidth = circleRadius / 10 * 2;
   const angleOffset = 360 / (2 * sectionsCount);
   const adjustment = isCardPreview ? 1 : 15;
-  const imageSize = circleRadius * 2 - borderWidth + adjustment;
+  const imageSize = isWheelWithoutBorder ? circleRadius * 2 + borderWidth + adjustment : circleRadius * 2 - borderWidth + adjustment;
   const image = await loadImage(imageUrl);
 
   wheel

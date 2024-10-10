@@ -133,7 +133,7 @@ function animateWheelSections(wheelGroup, giftValue, middlePartImageUri) {
         .attr('d', section.attr('d'))
         .attr('fill', d.id !== giftValue ? 'rgba(0, 0, 0, 0.7)' : 'none')
         .attr('pointer-events', 'none')
-        .attr('stroke', d.id !== giftValue ? 'none' : '#EE3EC8')
+        .attr('stroke', d.id !== giftValue ? 'none' : 'rgba(0,0,0,0)')
         .attr('stroke-width', d.id !== giftValue ? '0' : '8');
     });
 }

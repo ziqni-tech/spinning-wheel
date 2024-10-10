@@ -15,7 +15,7 @@ export async function createSpinnerWheelWithAnimation(
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
-  onScaleAnimationStart
+  isWheelWithoutBorder
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -91,20 +91,23 @@ export async function createSpinnerWheelWithAnimation(
     iconUris,
     tilesData,
     sectionColors,
-    !!middlePartImageUri
+    !!middlePartImageUri,
+    isWheelWithoutBorder
   );
 
   // BORDER
-  if (borderImageUrl) {
-    await createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
-  } else {
-    createWheelBorder(svg, borderContainer, circleRadius, wheelSettings.wheelSettings);
+  if (!isWheelWithoutBorder) {
+    if (borderImageUrl) {
+      await createBorderImage(svg, centerX, centerY, circleRadius, borderImageUrl);
+    } else {
+      createWheelBorder(svg, borderContainer, circleRadius, wheelSettings.wheelSettings, !!middlePartImageUri);
+    }
   }
 
   // WHEEL SECTIONS
   if (middlePartImageUri) {
     createSections(wheel, pieData, false);
-    await insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length);
+    await insertWheelImage(wheel, middlePartImageUri, circleRadius, tilesData.length, false, isWheelWithoutBorder);
   } else {
     createSections(wheel, pieData);
   }
@@ -192,11 +195,7 @@ export async function createSpinnerWheelWithAnimation(
         );
       });
 
-    setTimeout(() => {
-      if (typeof onScaleAnimationStart === 'function') {
-        onScaleAnimationStart({ message: 'Spin animation started' });
-      }
-    }, 4000)
+
 
     setTimeout(() => {
 

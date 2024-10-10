@@ -21,7 +21,6 @@ const outerCircleBordersGradientData = [
 
 export async function createBorderImage(svg, centerX, centerY, radius, imageUrl) {
   const borderWidth = radius / 10 * 2;
-  // const imageSize = radius >= 280 ? radius * 2 + 80 : radius * 2 + 50;
   const imageSize = radius * 2 + borderWidth;
 
   const borderImageGroup = svg.append('g')
@@ -43,8 +42,9 @@ export async function createBorderImage(svg, centerX, centerY, radius, imageUrl)
   svg.node().insertBefore(borderImageGroup.node(), svg.node().firstChild);
 }
 
-export const createWheelBorder = (svg, borderContainer, radius, wheelSettings) => {
-  const strokeWidth = radius / 10 * 2;
+export const createWheelBorder = (svg, borderContainer, radius, wheelSettings, applyScaleFactor) => {
+  const scaleFactor = applyScaleFactor ? 0.93 : 1;
+  const strokeWidth = radius / 10 * 2 * scaleFactor;
 
   const wheelBackground = wheelSettings && wheelSettings.wheelBackground
     ? wheelSettings.wheelBackground
@@ -69,7 +69,7 @@ export const createWheelBorder = (svg, borderContainer, radius, wheelSettings) =
     ? wheelSettings.wheelBordersColor
     : 'url(#circle-borders-gradient)';
 
-  const outerCircleBorderRadius = radius + strokeWidth / 2;
+  const outerCircleBorderRadius = (radius + strokeWidth / 2) * scaleFactor;
   borderContainer
     .append('circle')
     .attr('class', 'outer-circle-border')

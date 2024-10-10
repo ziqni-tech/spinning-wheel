@@ -9,13 +9,17 @@ export const generatePieData = (
   iconUris,
   tilesData,
   sectionColors,
-  isImageMiddlePart
+  isImageMiddlePart,
+  isWheelWithoutBorder
 ) => {
   const pie = d3.pie()
     .sort(null)
     .value(1);
   const borderWidth = radius / 10;
-  const wheelRadius = isImageMiddlePart ? radius - borderWidth + 10 : radius;
+
+  const wheelRadius = isWheelWithoutBorder
+  ? radius + borderWidth + 10
+  : (isImageMiddlePart ? radius - borderWidth + 10 : radius);
 
   return pie(d3.range(sectionsCount)).map((d, i) => {
     return {
