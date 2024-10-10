@@ -18,7 +18,7 @@ export const generatePieData = (
   const borderWidth = radius / 10;
 
   const wheelRadius = isWheelWithoutBorder
-  ? radius + borderWidth + 10
+  ? radius + borderWidth + 7
   : (isImageMiddlePart ? radius - borderWidth + 10 : radius);
 
   return pie(d3.range(sectionsCount)).map((d, i) => {

@@ -1,11 +1,12 @@
 import { loadImage } from './loadImage.js';
 
-export async function createArrowImage(svg, circleRadius, centerX, centerY, imageUrl) {
+export async function createArrowImage(svg, circleRadius, centerX, centerY, imageUrl, isWheelWithoutBorder) {
   const imageSize = circleRadius / 3;
+  const adjustment = isWheelWithoutBorder ? 25 : 10;
 
   const arrowGroup = svg.append('g')
     .attr('class', 'pointer-arrow-group')
-    .attr('transform', `translate(${ centerX - imageSize / 2 }, ${ centerY - circleRadius - imageSize / 2 - 10 })`);
+    .attr('transform', `translate(${ centerX - imageSize / 2 }, ${ centerY - circleRadius - imageSize / 2 - adjustment })`);
 
   const arrowImage = await loadImage(imageUrl);
 
@@ -17,7 +18,7 @@ export async function createArrowImage(svg, circleRadius, centerX, centerY, imag
     .attr('height', imageSize);
 }
 
-export function createArrowPointer(svg, circleRadius, centerX, centerY) {
+export function createArrowPointer(svg, circleRadius, centerX, centerY, isWheelWithoutBorder) {
   const width = circleRadius / 2.5;
   const height = circleRadius / 2.5;
 

@@ -136,9 +136,9 @@ export async function createSpinnerWheelWithAnimation(
   const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage;
 
   if (arrowImageUri) {
-    await createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
+    await createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri, isWheelWithoutBorder);
   } else {
-    createArrowPointer(svg, circleRadius, centerX, centerY);
+    createArrowPointer(svg, circleRadius, centerX, centerY, isWheelWithoutBorder);
   }
 
   const wheelGroup = spinnerContainer.select('.wheel-group');
@@ -222,7 +222,7 @@ export async function createSpinnerWheelWithAnimation(
       .attr('transform', () => {
         const rotationAngle = 0;
         const arrowImageSize = circleRadius / 2.5;
-        const adjustment = arrowImageUri ? 10 : 25;
+        const adjustment = isWheelWithoutBorder && arrowImageUri ? 20 : arrowImageUri ? 10 : 25;
         return `translate(${centerX - arrowImageSize / 2}, ${centerY - circleRadius - arrowImageSize / 2 - adjustment}) rotate(${rotationAngle})`;
       });
 
