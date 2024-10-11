@@ -15,8 +15,8 @@ export async function createSpinnerWheelWithAnimation(
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
-  isCardPreview = false,
-  isWheelWithoutBorder
+  isWheelWithoutBorder = false,
+  isCardPreview = false
 ) {
 
   const spinnerContainer = d3.select(containerId);

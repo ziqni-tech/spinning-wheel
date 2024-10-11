@@ -41,7 +41,7 @@ export const wheelCenterButton = (buttonContainer, wheelSettings, circleRadius, 
 
   const defaultSpinButtonBackground = '#5E084B';
 
-  const buttonRadius = isCardPreview ? circleRadius / 8 : 40;
+  const buttonRadius = circleRadius / 8;
   // const buttonRadius = 40;
 
   const buttonText = wheelSettings && wheelSettings.buttonText
