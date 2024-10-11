@@ -6,8 +6,8 @@ export async function createWheelImageButton(buttonContainer, centerX, centerY, 
     .append('g')
     .attr('class', 'spin-button')
 
-  const buttonSize = circleRadius / 4;
-  // const buttonSize = 80;
+  // const buttonSize = circleRadius / 4;
+  const buttonSize = 80;
 
   const image = await loadImage(imageUrl);
 

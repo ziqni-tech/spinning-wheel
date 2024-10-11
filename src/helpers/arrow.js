@@ -21,10 +21,11 @@ export async function createArrowImage(svg, circleRadius, centerX, centerY, imag
 export function createArrowPointer(svg, circleRadius, centerX, centerY, isWheelWithoutBorder) {
   const width = circleRadius / 2.5;
   const height = circleRadius / 2.5;
+  const adjustment = isWheelWithoutBorder ? 15 : 10;
 
   const arrowGroup = svg.append('g')
       .attr('class', 'pointer-arrow-group')
-      .attr('transform', `translate(${centerX - width / 2 + 5}, ${centerY - circleRadius - height / 2 - 25})`);
+      .attr('transform', `translate(${centerX - width / 2 + 5}, ${centerY - circleRadius - height / 2 - adjustment})`);
 
   arrowGroup
       .append('g')
