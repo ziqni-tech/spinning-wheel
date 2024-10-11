@@ -125,7 +125,7 @@ export async function createSpinnerWheel(
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
   if (buttonImageUri) {
-    await createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, buttonImageUri);
+    await createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, buttonImageUri, isCardPreview);
   } else {
     wheelCenterButton(buttonContainer, wheelSettings.wheelSettings, circleRadius, isCardPreview);
   }

@@ -15,6 +15,7 @@ export async function createSpinnerWheelWithAnimation(
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
+  isCardPreview = false,
   isWheelWithoutBorder
 ) {
 
@@ -127,9 +128,9 @@ export async function createSpinnerWheelWithAnimation(
   const buttonImageUri = wheelSettings.wheelSettings.wheelButtonImage;
 
   if (buttonImageUri) {
-    await createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, buttonImageUri);
+    await createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, buttonImageUri, isCardPreview);
   } else {
-    wheelCenterButton(buttonContainer, wheelSettings.wheelSettings, circleRadius);
+    wheelCenterButton(buttonContainer, wheelSettings.wheelSettings, circleRadius, isCardPreview);
   }
 
   // ARROW

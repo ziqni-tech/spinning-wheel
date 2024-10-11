@@ -1,13 +1,13 @@
 import { loadImage } from './loadImage.js';
 import * as d3 from 'd3';
 
-export async function createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, imageUrl) {
+export async function createWheelImageButton(buttonContainer, centerX, centerY, circleRadius, imageUrl, isCardPreview) {
   const buttonImageGroup = buttonContainer
     .append('g')
     .attr('class', 'spin-button')
 
-  // const buttonSize = circleRadius / 4;
-  const buttonSize = 80;
+  const buttonSize = isCardPreview ? circleRadius / 4 : 80;
+  // const buttonSize = 80;
 
   const image = await loadImage(imageUrl);
 
@@ -41,7 +41,7 @@ export const wheelCenterButton = (buttonContainer, wheelSettings, circleRadius, 
 
   const defaultSpinButtonBackground = '#5E084B';
 
-  const buttonRadius = circleRadius / 8;
+  const buttonRadius = isCardPreview ? circleRadius / 8 : 40;
   // const buttonRadius = 40;
 
   const buttonText = wheelSettings && wheelSettings.buttonText
