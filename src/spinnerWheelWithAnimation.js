@@ -17,7 +17,8 @@ export async function createSpinnerWheelWithAnimation(
   onSpinComplete,
   isWheelWithoutBorder = false,
   isCardPreview = false,
-  glowOptions = { showGlow: false, glowColor: '#406A8C' }
+  glowOptions = { showGlow: false, glowColor: '#406A8C' },
+  arrowOptions = { width: 80, height: 80, position: 'middle' },
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -186,7 +187,7 @@ export async function createSpinnerWheelWithAnimation(
   const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage;
 
   if (arrowImageUri) {
-    await createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri, isWheelWithoutBorder);
+    await createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri, isWheelWithoutBorder, arrowOptions);
   } else {
     createArrowPointer(svg, circleRadius, centerX, centerY, isWheelWithoutBorder);
   }

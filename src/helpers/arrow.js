@@ -1,12 +1,26 @@
 import { loadImage } from './loadImage.js';
 
-export async function createArrowImage(svg, circleRadius, centerX, centerY, imageUrl, isWheelWithoutBorder) {
-  const imageSize = circleRadius / 3;
-  const adjustment = isWheelWithoutBorder ? 25 : 10;
+export async function createArrowImage(svg, circleRadius, centerX, centerY, imageUrl, isWheelWithoutBorder, arrowOptions) {
+  // const adjustment = isWheelWithoutBorder ? 25 : 10;
+  const adjustment = 10;
+
+  let transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment;
+  switch (arrowOptions.position) {
+    case 'top':
+      transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment * 2;
+      break;
+    case 'middle':
+      transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment / 2;
+      break;
+    case 'bottom': {
+      transformY = centerY - circleRadius - arrowOptions.height / 2 + adjustment;
+      break;
+    }
+  }
 
   const arrowGroup = svg.append('g')
     .attr('class', 'pointer-arrow-group')
-    .attr('transform', `translate(${ centerX - imageSize / 2 }, ${ centerY - circleRadius - imageSize / 2 - adjustment })`);
+    .attr('transform', `translate(${ centerX - arrowOptions.width / 2 }, ${ transformY })`);
 
   const arrowImage = await loadImage(imageUrl);
 
@@ -14,8 +28,8 @@ export async function createArrowImage(svg, circleRadius, centerX, centerY, imag
     .append('image')
     .attr('class', 'arrow-img')
     .attr('xlink:href', arrowImage.src)
-    .attr('width', imageSize)
-    .attr('height', imageSize);
+    .attr('width', arrowOptions.width)
+    .attr('height', arrowOptions.height);
 }
 
 export function createArrowPointer(svg, circleRadius, centerX, centerY, isWheelWithoutBorder) {
