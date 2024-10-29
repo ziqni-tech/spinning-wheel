@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 
 const scale = 1.6;
 const containerHeightOffsetAdjustment = 2;
+
 // Animation for wheelGroup
 function animateWheelGroup(
   wheelGroup,
@@ -16,7 +17,7 @@ function animateWheelGroup(
     .duration(1000)
     .ease(d3.easeBackOut.overshoot(0.3))
     .delay(4000)
-    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) rotate(${ targetRotation }) scale(${scale})`);
+    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) rotate(${ targetRotation }) scale(${ scale })`);
 }
 
 function animateGlowGroup(
@@ -31,7 +32,7 @@ function animateGlowGroup(
     .duration(1000)
     .ease(d3.easeBackOut.overshoot(0.3))
     .delay(4000)
-    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${scale})`);
+    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${ scale })`);
 }
 
 // Animation for pointerArrowGroup
@@ -39,8 +40,11 @@ function animatePointerArrowGroup(
   pointerArrowGroup,
   circleRadius,
   centerX,
-  centerY
+  centerY,
+  isPointerArrowImage,
+  arrowOptions
 ) {
+
   const arrowImageSize = circleRadius / 2.5;
   pointerArrowGroup
     .transition()
@@ -52,7 +56,73 @@ function animatePointerArrowGroup(
       const radians = rotationAngle * Math.PI / 180;
       const xOffset = circleRadius * Math.sin(radians) / 2 + 10;
 
-      return `translate(${ centerX - arrowImageSize / 2 + xOffset }, ${ centerY - circleRadius - arrowImageSize / 2 - 10 }) rotate(${ rotationAngle })`;
+      if (isPointerArrowImage) {
+        let transformY = centerY - circleRadius - arrowOptions.height / 2;
+        const adjustment = 10;
+
+        switch (arrowOptions.position) {
+          case 'top':
+            transformY -= adjustment * 2;
+            break;
+          case 'middle':
+            transformY -= adjustment / 2;
+            break;
+          case 'bottom':
+            transformY += adjustment;
+            break;
+        }
+        return `translate(${ centerX - arrowOptions.width / 2 + xOffset }, ${ transformY }) rotate(${ rotationAngle })`;
+      } else {
+        return `translate(${ centerX - arrowImageSize / 2 + xOffset }, ${ centerY - circleRadius - arrowImageSize / 2 - 10 }) rotate(${ rotationAngle })`;
+      }
+
+    });
+}
+
+// Animation for pointerArrowGroup at the end
+function animatePointerArrowGroupEnd(
+  pointerArrowGroup,
+  circleRadius,
+  centerX,
+  centerY,
+  screenHeight,
+  isPointerArrowImage,
+  arrowOptions
+) {
+  const arrowImageSize = isPointerArrowImage ? circleRadius / 2.5 : circleRadius / 2.5;
+  pointerArrowGroup
+    .transition()
+    .duration(1000)
+    .ease(d3.easeBackOut.overshoot(0.3))
+    .delay(4000)
+    .attr('transform', () => {
+      const rotationAngle = 0;
+      if (isPointerArrowImage) {
+        const newOffsetX = centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowOptions.width;
+        const adjustment = 10;
+        const arrowHeight = arrowOptions.height * scale
+        let newOffsetY = centerY + (screenHeight / containerHeightOffsetAdjustment) - circleRadius * scale - arrowHeight / 2;
+
+        switch (arrowOptions.position) {
+          case 'top':
+            newOffsetY -= adjustment * 2;
+            break;
+          case 'middle':
+            newOffsetY -= adjustment / 2;
+            break;
+          case 'bottom':
+            newOffsetY += adjustment;
+            break;
+        }
+
+        return `translate(${ newOffsetX }, ${ newOffsetY }) rotate(${ rotationAngle }) scale(${ scale })`;
+      } else {
+
+        const newOffsetX = centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize + 20;
+        const newOffsetY = centerY + (screenHeight / containerHeightOffsetAdjustment) - circleRadius * 1.8 - arrowImageSize / 2 - 16;
+
+        return `translate(${ newOffsetX }, ${ newOffsetY }) rotate(${ rotationAngle }) scale(${ scale })`;
+      }
     });
 }
 
@@ -69,7 +139,7 @@ function animateBorderContainer(
     .duration(1000)
     .ease(d3.easeBackOut.overshoot(0.3))
     .delay(4000)
-    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${scale})`);
+    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${ scale })`);
 }
 
 function animateButtonContainer(centerX, centerY, screenHeight) {
@@ -78,7 +148,7 @@ function animateButtonContainer(centerX, centerY, screenHeight) {
     .duration(1000)
     .ease(d3.easeBackOut.overshoot(0.3))
     .delay(4000)
-    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${scale})`);
+    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${ scale })`);
 }
 
 function animateBorderImageContainer(
@@ -92,35 +162,7 @@ function animateBorderImageContainer(
     .duration(1000)
     .ease(d3.easeBackOut.overshoot(0.3))
     .delay(4000)
-    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${scale})`);
-}
-
-// Animation for pointerArrowGroup at the end
-function animatePointerArrowGroupEnd(
-  pointerArrowGroup,
-  circleRadius,
-  centerX,
-  centerY,
-  screenHeight,
-  isPointerArrowImage
-) {
-  const arrowImageSize = isPointerArrowImage ? circleRadius / 2.5 : circleRadius / 2.5;
-  pointerArrowGroup
-    .transition()
-    .duration(1000)
-    .ease(d3.easeBackOut.overshoot(0.3))
-    .delay(4000)
-    .attr('transform', () => {
-      const rotationAngle = 0;
-      const newOffsetX = isPointerArrowImage
-        ? centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize + 15
-        : centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowImageSize + 20;
-      const newOffsetY = isPointerArrowImage
-        ? centerY + (screenHeight / containerHeightOffsetAdjustment) - circleRadius * 1.8 - arrowImageSize / 2 - 6
-        : centerY + (screenHeight / containerHeightOffsetAdjustment) - circleRadius * 1.8 - arrowImageSize / 2 - 16;
-
-      return `translate(${ newOffsetX }, ${ newOffsetY }) rotate(${ rotationAngle }) scale(${scale})`;
-    });
+    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${ scale })`);
 }
 
 // Animation for wheel sections
@@ -170,14 +212,15 @@ export function startSpinAnimations(
   screenWidth,
   middlePartImageUri,
   giftValue,
-  isPointerArrowImage
+  isPointerArrowImage,
+  arrowOptions
 ) {
   animateWheelGroup(wheelGroup, centerX, centerY, targetRotation, circleRadius, screenHeight);
-  animateGlowGroup(glowGroup, centerX, centerY, circleRadius, screenHeight)
-  animatePointerArrowGroup(pointerArrowGroup, circleRadius, centerX, centerY);
+  animateGlowGroup(glowGroup, centerX, centerY, circleRadius, screenHeight);
+  animatePointerArrowGroup(pointerArrowGroup, circleRadius, centerX, centerY, isPointerArrowImage, arrowOptions);
   animateBorderContainer(borderContainer, centerX, centerY, circleRadius, screenHeight);
   animateButtonContainer(centerX, centerY, screenHeight);
   animateBorderImageContainer(circleRadius, centerX, centerY, screenHeight);
-  animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight, isPointerArrowImage);
+  animatePointerArrowGroupEnd(pointerArrowGroup, circleRadius, centerX, centerY, screenHeight, isPointerArrowImage, arrowOptions);
   animateWheelSections(wheelGroup, giftValue, middlePartImageUri);
 }

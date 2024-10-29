@@ -243,7 +243,8 @@ export async function createSpinnerWheelWithAnimation(
           screenWidth,
           middlePartImageUri,
           giftValue,
-          !!arrowImageUri
+          !!arrowImageUri,
+          arrowOptions
         );
       });
 
@@ -273,16 +274,41 @@ export async function createSpinnerWheelWithAnimation(
       .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY})`);
 
     const pointerArrowGroup = d3.select('.pointer-arrow-group');
-    pointerArrowGroup
-      .transition()
-      .duration(1000)
-      .ease(d3.easeBackOut.overshoot(0.3))
-      .attr('transform', () => {
-        const rotationAngle = 0;
-        const arrowImageSize = circleRadius / 2.5;
-        const adjustment = isWheelWithoutBorder && arrowImageUri ? 20 : arrowImageUri ? 10 : 25;
-        return `translate(${centerX - arrowImageSize / 2}, ${centerY - circleRadius - arrowImageSize / 2 - adjustment}) rotate(${rotationAngle})`;
-      });
+    if (arrowImageUri) {
+      const adjustment = 10;
+
+      let transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment;
+      switch (arrowOptions.position) {
+        case 'top':
+          transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment * 2;
+          break;
+        case 'middle':
+          transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment / 2;
+          break;
+        case 'bottom': {
+          transformY = centerY - circleRadius - arrowOptions.height / 2 + adjustment;
+          break;
+        }
+      }
+
+      pointerArrowGroup
+        .transition()
+        .duration(1000)
+        .ease(d3.easeBackOut.overshoot(0.3))
+        .attr('transform', `translate(${ centerX - arrowOptions.width / 2 }, ${ transformY })`);
+    } else {
+      pointerArrowGroup
+        .transition()
+        .duration(1000)
+        .ease(d3.easeBackOut.overshoot(0.3))
+        .attr('transform', () => {
+          const rotationAngle = 0;
+          const arrowImageSize = circleRadius / 2.5;
+          const adjustment = isWheelWithoutBorder && arrowImageUri ? 20 : arrowImageUri ? 10 : 25;
+          return `translate(${centerX - arrowImageSize / 2}, ${centerY - circleRadius - arrowImageSize / 2 - adjustment}) rotate(${rotationAngle})`;
+        });
+    }
+
 
     const borderContainer = d3.select('.border-container');
     borderContainer
