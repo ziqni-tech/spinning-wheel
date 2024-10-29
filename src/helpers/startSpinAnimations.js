@@ -19,6 +19,21 @@ function animateWheelGroup(
     .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) rotate(${ targetRotation }) scale(${scale})`);
 }
 
+function animateGlowGroup(
+  glowGroup,
+  centerX,
+  centerY,
+  circleRadius,
+  screenHeight
+) {
+  glowGroup
+    .transition()
+    .duration(1000)
+    .ease(d3.easeBackOut.overshoot(0.3))
+    .delay(4000)
+    .attr('transform', `translate(${ centerX },${ centerY + (screenHeight / containerHeightOffsetAdjustment) }) scale(${scale})`);
+}
+
 // Animation for pointerArrowGroup
 function animatePointerArrowGroup(
   pointerArrowGroup,
@@ -141,6 +156,7 @@ function animateWheelSections(wheelGroup, giftValue, middlePartImageUri) {
 // Function for animation that starts when rotation starts
 export function startSpinAnimations(
   wheelGroup,
+  glowGroup,
   pointerArrowGroup,
   borderContainer,
   spinButton,
@@ -157,6 +173,7 @@ export function startSpinAnimations(
   isPointerArrowImage
 ) {
   animateWheelGroup(wheelGroup, centerX, centerY, targetRotation, circleRadius, screenHeight);
+  animateGlowGroup(glowGroup, centerX, centerY, circleRadius, screenHeight)
   animatePointerArrowGroup(pointerArrowGroup, circleRadius, centerX, centerY);
   animateBorderContainer(borderContainer, centerX, centerY, circleRadius, screenHeight);
   animateButtonContainer(centerX, centerY, screenHeight);

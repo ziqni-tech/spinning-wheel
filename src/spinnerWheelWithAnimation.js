@@ -16,7 +16,8 @@ export async function createSpinnerWheelWithAnimation(
   wheelSettings = wheelSettingsData,
   onSpinComplete,
   isWheelWithoutBorder = false,
-  isCardPreview = false
+  isCardPreview = false,
+  glowOptions = { showGlow: false, glowColor: '#406A8C' }
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -67,6 +68,54 @@ export async function createSpinnerWheelWithAnimation(
 
   const viewBoxCenterX = containerWidth / 2;
   const viewBoxCenterY = containerHeight / 2;
+
+
+  const glowGroup = svg.append('g')
+    .attr('class', 'glow-group')
+    .attr('transform', `translate(${viewBoxCenterX}, ${viewBoxCenterY})`);
+
+  if (glowOptions.showGlow) {
+    // Adding a glow effect using a filter
+    const glowFilter = svg.append('defs')
+      .append('filter')
+      .attr('id', 'glow')
+      .attr('x', '-50%')
+      .attr('y', '-50%')
+      .attr('width', '200%')
+      .attr('height', '200%');
+
+
+    glowFilter.append('feGaussianBlur')
+      .attr('in', 'SourceAlpha')
+      .attr('stdDeviation', '23') // blur level
+      .attr('result', 'blur');
+
+    glowFilter.append('feFlood')
+      .attr('flood-color', glowOptions.glowColor) // glow color
+      .attr('result', 'color');
+
+    glowFilter.append('feComposite')
+      .attr('in2', 'blur')
+      .attr('operator', 'in')
+      .attr('result', 'blurColor');
+
+    const merge = glowFilter.append('feMerge');
+    merge.append('feMergeNode').attr('in', 'blurColor');
+    merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+    glowFilter.append('feMerge')
+      .append('feMergeNode')
+      .append('feMergeNode')
+      .attr('in', 'SourceGraphic')
+      .attr('in2', 'blurColor');
+
+    glowGroup
+      .append('circle')
+      .attr('r', circleRadius * 1.15)
+      .attr('stroke-width', 10)
+      .attr('filter', 'url(#glow)')
+  }
+
 
   const wheel = svg.append('g')
     .attr('class', 'wheel-group') // Assign a class to the wheel group
@@ -179,6 +228,7 @@ export async function createSpinnerWheelWithAnimation(
         // Add animation to move the wheel down and scale it up
         startSpinAnimations(
           wheelGroup,
+          glowGroup,
           pointerArrowGroup,
           borderContainer,
           spinButton,
@@ -214,6 +264,12 @@ export async function createSpinnerWheelWithAnimation(
       .duration(1000)
       .ease(d3.easeBackOut.overshoot(0.3))
       .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY}) rotate(${startAngleFirstSection})`);
+
+    glowGroup
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut.overshoot(0.3))
+      .attr('transform', `translate(${viewBoxCenterX},${viewBoxCenterY})`);
 
     const pointerArrowGroup = d3.select('.pointer-arrow-group');
     pointerArrowGroup
