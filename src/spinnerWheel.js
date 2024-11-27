@@ -14,7 +14,9 @@ export async function createSpinnerWheel(
   tilesData = tiles,
   wheelSettings = wheelSettingsData,
   onSpinComplete,
-  isCardPreview = false
+  isCardPreview = false,
+  isWheelWithoutBorder = false,
+  arrowOptions = { width: 80, height: 80, position: 'middle' }
 ) {
 
   const spinnerContainer = d3.select(containerId);
@@ -134,7 +136,15 @@ export async function createSpinnerWheel(
   const arrowImageUri = wheelSettings.wheelSettings.wheelArrowImage;
 
   if (arrowImageUri) {
-    if (!isCardPreview) createArrowImage(svg, circleRadius, centerX, centerY, arrowImageUri);
+    if (!isCardPreview) createArrowImage(
+      svg,
+      circleRadius,
+      centerX,
+      centerY,
+      arrowImageUri,
+      isWheelWithoutBorder,
+      arrowOptions
+    );
   } else {
     if (!isCardPreview) createArrowPointer(svg, circleRadius, centerX, centerY);
   }
