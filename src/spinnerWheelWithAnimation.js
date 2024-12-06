@@ -33,12 +33,6 @@ export async function createSpinnerWheelWithAnimation(
     return hasId ? tile.iconLink : null;
   });
 
-  function handleWindowResize() {
-    window.location.reload();
-  }
-
-  window.addEventListener('resize', handleWindowResize);
-
   // Cleaning up SVG before adding new elements
   function clearSVG() {
     d3.select(containerId).select('svg').remove();
@@ -251,7 +245,6 @@ export async function createSpinnerWheelWithAnimation(
 
 
     setTimeout(() => {
-
       if (typeof onSpinComplete === 'function') {
         onSpinComplete({ isCompleted: true });
       }
@@ -277,16 +270,24 @@ export async function createSpinnerWheelWithAnimation(
     if (arrowImageUri) {
       const adjustment = 10;
 
-      let transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment;
+      let arrowOptionsWidth = arrowOptions.width;
+      let arrowOptionsHeight = arrowOptions.height;
+
+      if (circleRadius < 180) {
+        arrowOptionsWidth = circleRadius / 3;
+        arrowOptionsHeight = circleRadius / 3;
+      }
+
+      let transformY = centerY - circleRadius - arrowOptionsHeight / 2 - adjustment;
       switch (arrowOptions.position) {
         case 'top':
-          transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment * 2;
+          transformY = centerY - circleRadius - arrowOptionsHeight / 2 - adjustment * 2;
           break;
         case 'middle':
-          transformY = centerY - circleRadius - arrowOptions.height / 2 - adjustment / 2;
+          transformY = centerY - circleRadius - arrowOptionsHeight / 2 - adjustment / 2;
           break;
         case 'bottom': {
-          transformY = centerY - circleRadius - arrowOptions.height / 2 + adjustment;
+          transformY = centerY - circleRadius - arrowOptionsHeight / 2 + adjustment;
           break;
         }
       }
@@ -295,7 +296,7 @@ export async function createSpinnerWheelWithAnimation(
         .transition()
         .duration(1000)
         .ease(d3.easeBackOut.overshoot(0.3))
-        .attr('transform', `translate(${ centerX - arrowOptions.width / 2 }, ${ transformY })`);
+        .attr('transform', `translate(${ centerX - arrowOptionsWidth / 2 }, ${ transformY })`);
     } else {
       pointerArrowGroup
         .transition()

@@ -6,12 +6,17 @@ export async function createWheelImageButton(buttonContainer, centerX, centerY, 
     .append('g')
     .attr('class', 'spin-button')
 
-  const buttonSize = isCardPreview ? circleRadius / 4 : 80;
-  // const buttonSize = 80;
+  let buttonSize = isCardPreview ? circleRadius / 4 : circleRadius / 2.7;
+
+  if (circleRadius < 80 && !isCardPreview) {
+    buttonSize = 30
+  } else if (circleRadius < 180 && !isCardPreview) {
+    buttonSize = 40
+  }
 
   const image = await loadImage(imageUrl);
 
-  const imageElement = buttonImageGroup
+  buttonImageGroup
     .append('image')
     .attr('class', 'wheel-image-button')
     .attr('xlink:href', image.src)

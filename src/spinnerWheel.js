@@ -31,12 +31,6 @@ export async function createSpinnerWheel(
     return hasId ? tile.iconLink : null;
   });
 
-  function handleWindowResize() {
-    window.location.reload();
-  }
-
-  window.addEventListener('resize', handleWindowResize);
-
   // Cleaning up SVG before adding new elements
   function clearSVG() {
     d3.select(containerId).select('svg').remove();

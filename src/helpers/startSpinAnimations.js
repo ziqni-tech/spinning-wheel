@@ -57,7 +57,15 @@ function animatePointerArrowGroup(
       const xOffset = circleRadius * Math.sin(radians) / 2 + 10;
 
       if (isPointerArrowImage) {
-        let transformY = centerY - circleRadius - arrowOptions.height / 2;
+        let arrowWidth = arrowOptions.width;
+        let arrowHeight = arrowOptions.height;
+
+        if (circleRadius < 180) {
+          arrowWidth = circleRadius / 3;
+          arrowHeight = circleRadius / 3;
+        }
+
+        let transformY = centerY - circleRadius - arrowHeight / 2;
         const adjustment = 10;
 
         switch (arrowOptions.position) {
@@ -71,7 +79,7 @@ function animatePointerArrowGroup(
             transformY += adjustment;
             break;
         }
-        return `translate(${ centerX - arrowOptions.width / 2 + xOffset }, ${ transformY }) rotate(${ rotationAngle })`;
+        return `translate(${ centerX - arrowWidth / 2 + xOffset }, ${ transformY }) rotate(${ rotationAngle })`;
       } else {
         return `translate(${ centerX - arrowImageSize / 2 + xOffset }, ${ centerY - circleRadius - arrowImageSize / 2 - 10 }) rotate(${ rotationAngle })`;
       }
@@ -98,9 +106,17 @@ function animatePointerArrowGroupEnd(
     .attr('transform', () => {
       const rotationAngle = 0;
       if (isPointerArrowImage) {
-        const newOffsetX = centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowOptions.width;
+        let arrowOptionsWidth = arrowOptions.width;
+        let arrowOptionsHeight = arrowOptions.height;
+
+        if (circleRadius < 180) {
+          arrowOptionsWidth = circleRadius / 3;
+          arrowOptionsHeight = circleRadius / 3;
+        }
+
+        const newOffsetX = centerX - (circleRadius * Math.sin(rotationAngle * Math.PI / 180)) - arrowOptionsWidth;
         const adjustment = 10;
-        const arrowHeight = arrowOptions.height * scale
+        const arrowHeight = arrowOptionsHeight * scale
         let newOffsetY = centerY + (screenHeight / containerHeightOffsetAdjustment) - circleRadius * scale - arrowHeight / 2;
 
         switch (arrowOptions.position) {

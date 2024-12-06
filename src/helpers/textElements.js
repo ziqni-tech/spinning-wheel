@@ -93,7 +93,8 @@ export function addTextElements(
       if (fontMatch) getFontFamilyFromClass(fontMatch);
     })
     .style('font-size', (d, i) => {
-      const height = isCardPreview ? 5 : parseInt(d3.select(`#section-${i + 1}`).style('height'), 10);
+      const section = d3.select(`#section-${i + 1}`);
+      const height = section.empty() ? 20 : parseInt(section.style('height'), 10);
       return `${height}px`;
     })
     .html((d, i) => {
