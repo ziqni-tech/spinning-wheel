@@ -8,10 +8,10 @@ export async function createWheelImageButton(buttonContainer, centerX, centerY, 
 
   let buttonSize = isCardPreview ? circleRadius / 4 : circleRadius / 2.7;
 
-  if (circleRadius < 80 && !isCardPreview) {
-    buttonSize = 30
-  } else if (circleRadius < 180 && !isCardPreview) {
+  if (circleRadius < 95 && !isCardPreview) {
     buttonSize = 40
+  } else if (circleRadius < 180 && !isCardPreview) {
+    buttonSize = 60
   }
 
   const image = await loadImage(imageUrl);
